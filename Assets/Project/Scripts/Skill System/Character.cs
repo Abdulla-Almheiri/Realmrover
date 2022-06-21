@@ -9,7 +9,7 @@ namespace Realmrover
         public CharacterTemplate CharacterTemplate = null;
         private int _level = 1;
         private bool _alive = false;
-        public bool Is_Player = false;
+        public bool IsPlayer = false;
 
         private int _maxHealthPerLevel = 0;
         private int _maxEnergyPerLevel = 0;
@@ -27,6 +27,11 @@ namespace Realmrover
         private int Reflect = 0;
 
         private List<Skill> _skills = new List<Skill>();
+
+        private int _damageIncreaseNextAbility = 0;
+        private int _energyCostReductionNextAbility = 0;
+        private Dictionary<Skill, int> _damageIncreaseNextByAbility = new Dictionary<Skill, int>();
+        private Dictionary<Skill, int> _energyCostReductionNextByAbility = new Dictionary<Skill, int>();
 
         private Animator _animator;
         // Start is called before the first frame update
@@ -76,9 +81,17 @@ namespace Realmrover
                 return;
             }
 
-            if(skill.Damage > 0)
+            if(HasEnergyFor(skill, out int energyCost) == false)
             {
-                target.TakeDamage(skill.Damage,this, gameManager);
+                return;
+            }
+
+            _energy -= energyCost;
+            
+
+            if(skill.BaseDamage > 0)
+            {
+                target.TakeDamage(CalculateDamageNextAbility(skill),this, gameManager);
 
             }
 
@@ -92,39 +105,10 @@ namespace Realmrover
             {
                 Heal(skill.Heal, gameManager);
             }
-
-            //spawn vfx
-            var skillEnemyVFX = skill.EnemySkillPrefab;
-            if(skillEnemyVFX != null)
-            {
-                var spawnedEffect = Instantiate(skillEnemyVFX, gameManager.Enemy.transform);
-                spawnedEffect.transform.parent = null;
-
-            }
-
-            var skillSelfVFX = skill.SelfSkillPrefab;
-            if (skillSelfVFX != null)
-            {
-                var spawnedEffect = Instantiate(skillSelfVFX, transform);
-                spawnedEffect.transform.parent = null;
-
-            }
-
-            if(Is_Player)
-            {
-                if (skill.AnimationType == PlayerAnimationType.SHIELD)
-                {
-                    _animator.SetTrigger("Shield");
-                } else
-                {
-                    _animator.SetTrigger("Attack");
-                }
-
-            } else
-            {
-                _animator.SetTrigger("Attack");
-            }
-
+            SpawnSkillVFX(skill, gameManager);
+            ClearNextBonusAll();
+            ClearNextBonusBySkill(skill);
+            ApplyNextBonusFromSkill(skill);
         }
 
         public void ApplyEffectOverTime(Skill skill, GameManager gameManager)
@@ -188,6 +172,130 @@ namespace Realmrover
         public float EnergyPercent()
         {
             return (float)_energy / (float)_maxEnergy;
+        }
+
+        public bool HasEnergyFor(Skill skill, out int finalEnergyCost)
+        {
+            int finalCost = skill.EnergyCost;
+            int costReductionNextByAbility = 0;
+            if (_energyCostReductionNextByAbility.ContainsKey(skill))
+            {
+                costReductionNextByAbility = _energyCostReductionNextByAbility[skill];
+            }
+
+            finalCost = finalCost - (_energyCostReductionNextAbility * skill.EnergyCost / 100);
+            finalCost = finalCost - (costReductionNextByAbility * skill.EnergyCost / 100);
+            finalEnergyCost = finalCost;
+
+            if (_energy >= finalCost)
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
+            
+        }
+
+        private int CalculateDamageNextAbility(Skill skill)
+        {
+            int result = skill.BaseDamage;
+            result += _damageIncreaseNextAbility * skill.BaseDamage / 100;
+
+            if(_damageIncreaseNextByAbility.ContainsKey(skill))
+            {
+                result += _damageIncreaseNextByAbility[skill] * skill.BaseDamage / 100;
+
+            }
+            return result;
+        }
+
+
+        private void ApplyNextBonusFromSkill(Skill skill)
+        {
+            if(skill == null)
+            {
+                return;
+            }
+
+            if(skill.EnhanceNextSkill == null)
+            {
+                _damageIncreaseNextAbility += skill.EnhanceNextDamage;
+                _energyCostReductionNextAbility += skill.EnhanceNextEnergyCost;
+            } else
+            {
+                if (_damageIncreaseNextByAbility.ContainsKey(skill))
+                {
+                    _damageIncreaseNextByAbility[skill] += skill.EnhanceNextDamage;
+                } else
+                {
+                    _damageIncreaseNextByAbility.Add(skill, skill.EnhanceNextDamage);
+                }
+
+                if (_energyCostReductionNextByAbility.ContainsKey(skill))
+                {
+                    _energyCostReductionNextByAbility[skill] += skill.EnhanceNextEnergyCost;
+                }
+                else
+                {
+                    _energyCostReductionNextByAbility.Add(skill, skill.EnhanceNextEnergyCost);
+                }
+            }
+        }
+
+        private void ClearNextBonusAll()
+        {
+            _damageIncreaseNextAbility = 0;
+            _energyCostReductionNextAbility = 0;
+        }
+
+        private void ClearNextBonusBySkill(Skill skill)
+        {
+            if(_damageIncreaseNextByAbility.ContainsKey(skill))
+            {
+                _damageIncreaseNextByAbility[skill] = 0;
+            }
+
+            if(_energyCostReductionNextByAbility.ContainsKey(skill))
+            {
+                _energyCostReductionNextByAbility[skill] = 0;
+            }
+        }
+
+        private void SpawnSkillVFX(Skill skill, GameManager gameManager)
+        {
+            var skillEnemyVFX = skill.EnemySkillPrefab;
+            if (skillEnemyVFX != null)
+            {
+                var spawnedEffect = Instantiate(skillEnemyVFX, IsPlayer? gameManager.Enemy.transform: gameManager.Player.transform);
+                spawnedEffect.transform.parent = null;
+
+            }
+
+            var skillSelfVFX = skill.SelfSkillPrefab;
+            if (skillSelfVFX != null)
+            {
+                var spawnedEffect = Instantiate(skillSelfVFX, transform);
+                spawnedEffect.transform.parent = null;
+
+            }
+
+            if (IsPlayer)
+            {
+                if (skill.AnimationType == PlayerAnimationType.SHIELD)
+                {
+                    _animator.SetTrigger("Shield");
+                }
+                else
+                {
+                    _animator.SetTrigger("Attack");
+                }
+
+            }
+            else
+            {
+                _animator.SetTrigger("Attack");
+            }
         }
     }
 

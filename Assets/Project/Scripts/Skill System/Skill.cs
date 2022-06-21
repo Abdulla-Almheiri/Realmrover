@@ -15,10 +15,12 @@ namespace Realmrover
 
         [Header("Direct Effects")]
         public int EnergyCost = 0;
-        public int Damage = 0;
+        public int BaseDamage = 0;
         public int Heal = 0;
         public int Absorb = 0;
         public int ReflectDamage = 0;
+        public int DamagePercentMissingHealth = 0;
+        public int DamagePercentAbsorbAmount = 0;
 
         [Header("Effects per turn")]
         public int DamagePerTurn = 0;
