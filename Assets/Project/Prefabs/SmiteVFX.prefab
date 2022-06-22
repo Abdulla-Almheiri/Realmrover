@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9092037741721303402}
   - component: {fileID: 6349912004695961297}
   - component: {fileID: 7375395303573435195}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SmiteVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}

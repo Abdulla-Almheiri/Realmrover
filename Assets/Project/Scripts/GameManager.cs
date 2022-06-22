@@ -18,19 +18,28 @@ namespace Realmrover
         public SliderUI EnemyHealth;
         public SliderUI EnemyEnergy;
 
-        private void Start()
+        public GameObject DamageNumberUIPrefab;
+
+        public Canvas DynamicCanvas;
+
+        private bool _playerTurn = true;
+        private float _abilityRechargeTime = 1f;
+
+        private float _turnDelayTime = 1f;
+
+        private void Awake()
         {
             _player = Player.GetComponent<Character>();
+            _player.Initialize(this);
             _enemy = Enemy.GetComponent<Character>();
+            _enemy.Initialize(this);
 
         }
         private void Update()
         {
-            if(Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                _player.ActivateSkill(0,_enemy, this);
-            }
 
+            HandleAbilityRecharge();
+            HandlePlayerInput();
             UpdateUI();
         }
 
@@ -40,6 +49,106 @@ namespace Realmrover
             PlayerEnergy.UpdateValue(_player.EnergyPercent());
             EnemyHealth.UpdateValue(_enemy.HealthPercent());
             EnemyEnergy.UpdateValue(_enemy.EnergyPercent());
+
+        }
+
+        public void SpawnDamageNumber(int value, bool AtEnemy = true)
+        {
+            var spawn = Instantiate(DamageNumberUIPrefab, DynamicCanvas.transform);
+            spawn.GetComponent<DamageNumber>().Initialize(value, AtEnemy ? Enemy.transform.position : Player.transform.position);
+
+        }
+
+        public void EndTurn(Character endedByCharacter)
+        {
+            if (endedByCharacter.IsPlayer == true)
+            {
+                _playerTurn = false;
+                _enemy.EndTurn();
+                _enemy.MakeNextMove(_player, this);
+
+
+            } else
+            {
+                _player.EndTurn();
+                _playerTurn = true;
+            }
+        }
+
+        public void EndTurnButtonPress()
+        {
+            EndTurn(_player);
+        }
+        private void HandlePlayerInput()
+        {
+            if (_playerTurn != true)
+            {
+                return;
+            }
+
+            if(IsRecharging())
+            {
+                return;
+            }
+
+
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                if (_player.ActivateSkill(0, _enemy) == true)
+                {
+                    TriggerAbilityRecharge();
+                }
+            }
+
+
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                if (_player.ActivateSkill(1, _enemy) == true)
+                {
+                    TriggerAbilityRecharge();
+                }
+            }
+
+
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                if (_player.ActivateSkill(2, _enemy) == true)
+                {
+                    TriggerAbilityRecharge();
+                }
+            }
+
+
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                if (_player.ActivateSkill(3, _enemy) == true)
+                {
+                    TriggerAbilityRecharge();
+                }
+            }
+        }
+
+        private void TriggerAbilityRecharge(float rechargeTime = 1f)
+        {
+            _abilityRechargeTime = Mathf.Clamp(rechargeTime, 0, 10000f);
+
+        }
+
+        private void HandleAbilityRecharge()
+        {
+            if (_abilityRechargeTime > 0)
+            {
+                _abilityRechargeTime -= Time.deltaTime;
+            }
+        }
+
+        private bool IsRecharging()
+        {
+            return _abilityRechargeTime >= 0.1f;
+        }
+
+        public void ApplyDelay(float duration)
+        {
 
         }
     }

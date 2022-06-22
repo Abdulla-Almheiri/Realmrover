@@ -10,6 +10,7 @@ namespace Realmrover
         private int _level = 1;
         private bool _alive = false;
         public bool IsPlayer = false;
+        private GameManager _gameManager;
 
         private int _maxHealthPerLevel = 0;
         private int _maxEnergyPerLevel = 0;
@@ -23,8 +24,8 @@ namespace Realmrover
         private int _maxEnergy = 0;
         private int _energyRegen = 0;
 
-        private int Absorb = 0;
-        private int Reflect = 0;
+        private int _absorb = 0;
+        private int _reflect = 0;
 
         private List<Skill> _skills = new List<Skill>();
 
@@ -33,11 +34,23 @@ namespace Realmrover
         private Dictionary<Skill, int> _damageIncreaseNextByAbility = new Dictionary<Skill, int>();
         private Dictionary<Skill, int> _energyCostReductionNextByAbility = new Dictionary<Skill, int>();
 
+        private Dictionary<Skill, EffectOverTurns> _healOverTimeEffects = new Dictionary<Skill, EffectOverTurns>();
+        private Dictionary<Skill, EffectOverTurns> _IncreaseDamageForTurnsEffects = new Dictionary<Skill, EffectOverTurns>();
+        private Dictionary<Skill, EffectOverTurns> _reduceDamageTakenForTurnsEffects = new Dictionary<Skill, EffectOverTurns>();
+        private Dictionary<Skill, EffectOverTurns> _reduceEnergyCostForTurnsEffects = new Dictionary<Skill, EffectOverTurns>();
+
+        private Dictionary<Skill, EffectOverTurns> _damageOverTimeEffects = new Dictionary<Skill, EffectOverTurns>();
+        private Dictionary<Skill, EffectOverTurns> _damageTakenIncreaseEffects = new Dictionary<Skill, EffectOverTurns>();
+
         private Animator _animator;
         // Start is called before the first frame update
+
+        private void Awake()
+        {
+        }
         void Start()
         {
-            Initialize();
+
         }
 
         // Update is called once per frame
@@ -46,9 +59,10 @@ namespace Realmrover
 
         }
 
-        private void Initialize(bool updateStatsPerLevel = false)
+        public void Initialize(GameManager gameManager, bool updateStatsPerLevel = false)
         {
-            if(CharacterTemplate == null)
+            _gameManager = gameManager;
+            if (CharacterTemplate == null)
             {
                 return;
             }
@@ -61,7 +75,7 @@ namespace Realmrover
             _HealthRegenPerLevel = CharacterTemplate.HealthRegenPerLevel;
 
             _level = CharacterTemplate.Level;
-            _currentHealth = CharacterTemplate.Health + (updateStatsPerLevel? _level-1: 0)* _maxHealthPerLevel;
+            _currentHealth = CharacterTemplate.Health + (updateStatsPerLevel ? _level - 1 : 0) * _maxHealthPerLevel;
             _maxHealth = _currentHealth;
             _healthRegen = CharacterTemplate.HealthRegen + (updateStatsPerLevel ? _level - 1 : 0) * _HealthRegenPerLevel;
             _energy = CharacterTemplate.Energy + (updateStatsPerLevel ? _level - 1 : 0) * _maxEnergyPerLevel;
@@ -73,76 +87,167 @@ namespace Realmrover
             _animator = GetComponent<Animator>();
         }
 
-        public void ActivateSkill(int index, Character target, GameManager gameManager)
+        public bool ActivateSkill(int index, Character target)
         {
-            var skill = _skills[index];
-            if(skill == null)
+            if (IsAlive() == false)
             {
-                return;
+                return false;
             }
 
-            if(HasEnergyFor(skill, out int energyCost) == false)
+            var skill = _skills[index];
+
+            if (skill == null)
             {
-                return;
+                return false;
+            }
+
+            if (HasEnergyFor(skill, out int energyCost) == false)
+            {
+                return false;
             }
 
             _energy -= energyCost;
-            
+            ClearNextEnergyBonusAll();
+            ClearNextEnergyBonusBySkill(skill);
 
-            if(skill.BaseDamage > 0)
+            if (skill.BaseDamage > 0)
             {
-                target.TakeDamage(CalculateDamageNextAbility(skill),this, gameManager);
+                target.TakeDamage(CalculateDamageNextAbility(skill, this, target), this, _gameManager);
+                ClearNextDamageBonusAll();
+                ClearNextDamageBonusBySkill(skill);
 
             }
 
-            if(skill.DamagePerTurn > 0)
+            if (skill.Absorb > 0)
+            {
+                ApplyAbsorbFromSkill(skill);
+            }
+
+            if (skill.ReflectDamage > 0)
+            {
+                ApplyReflectFromSkill(skill);
+            }
+
+            if (skill.DamagePerTurn > 0)
             {
 
             }
 
 
-            if(skill.Heal > 0)
+            if (skill.Heal > 0)
             {
-                Heal(skill.Heal, gameManager);
+                Heal(skill.Heal);
             }
-            SpawnSkillVFX(skill, gameManager);
-            ClearNextBonusAll();
-            ClearNextBonusBySkill(skill);
+
+            if(skill.HealPerTurn > 0)
+            {
+                ApplyHealOverTimeEffect(skill);
+            }
+            SpawnSkillVFX(skill, _gameManager);
+
+
             ApplyNextBonusFromSkill(skill);
+            return true;
         }
 
-        public void ApplyEffectOverTime(Skill skill, GameManager gameManager)
+        public void ApplyEffectsOverTime(Skill skill, GameManager gameManager)
         {
 
         }
 
-        public void TakeDamage(int amount, Character attacker, GameManager gameManager)
+        private void ApplyHealOverTimeEffect(Skill skill)
         {
-            if(_alive == false)
+            if(_healOverTimeEffects.ContainsKey(skill))
+            {
+                if(skill.HealOverTimeStacks == false)
+                {
+                    if (skill.HealOverTimeRefreshesDuration == true)
+                    {
+                        _healOverTimeEffects[skill].Turns = skill.HealTurns;
+                    }
+
+                    return;
+                } else
+                {
+                    _healOverTimeEffects[skill].Amount += skill.HealPerTurn;
+
+                }
+            } else
+            {
+                _healOverTimeEffects.Add(skill, new EffectOverTurns(skill.HealPerTurn, skill.HealTurns, skill));
+            }
+        }
+        private void TriggerAllEffectsOverTime()
+        {
+            TriggerHealOverTimeEffects();
+        }
+
+        private void TriggerHealOverTimeEffects()
+        {
+            if(_healOverTimeEffects.Count == 0)
+            {
+                Debug.Log("NO HEAL OVER TIME ADDED");
+                return;
+            }
+            var values = _healOverTimeEffects.Values;
+            foreach (EffectOverTurns effect in values)
+            {
+                if(effect.Turns == 0 )
+                {
+                    _healOverTimeEffects.Remove(effect.Source);
+                    continue;
+                }
+                Heal(effect.Amount);
+                effect.Turns--;
+            }
+
+        }
+        public void TakeDamage(int amount, Character attacker, bool ignoreReflect = false)
+        {
+            if (IsAlive() == false)
             {
                 return;
             }
 
-            if(Absorb > 0)
+            if (_reflect > 0 && ignoreReflect == false)
             {
-                Absorb -= amount;
-                if(Absorb < 0)
+                if (_reflect >= amount)
                 {
-                    _currentHealth += Absorb;
-                    Absorb = 0;
-                    CheckDead();
+                    attacker.TakeDamage(amount, this, true);
+                    _reflect -= amount;
+                } else
+                {
+                    attacker.TakeDamage(_reflect, this, true);
+                    _reflect = 0;
+                }
+
+            }
+
+            if (_absorb > 0)
+            {
+                int originalAmount = amount;
+                amount -= _absorb;
+                if (amount >= 0)
+                {
+                    _absorb = 0;
+                }
+                else
+                {
+                    _absorb -= originalAmount;
+                    amount = 0;
                 }
             }
 
             _currentHealth -= amount;
             Debug.Log(amount + " damage taken by " + this.CharacterTemplate.name + ". Health is : " + _currentHealth + "/" + _maxHealth);
+            _gameManager.SpawnDamageNumber(amount, attacker.IsPlayer);
             _animator.SetTrigger("Hit");
             CheckDead();
         }
 
         private void CheckDead()
         {
-            if(_currentHealth <= 0)
+            if (_currentHealth <= 0)
             {
                 _alive = false;
                 _currentHealth = 0;
@@ -150,10 +255,12 @@ namespace Realmrover
             }
         }
 
-        public void Heal(int amount, GameManager gameManager)
+        public void Heal(int amount)
         {
+            _gameManager.SpawnDamageNumber(amount, false);
             _currentHealth += amount;
-            if(_currentHealth > _maxHealth)
+
+            if (_currentHealth > _maxHealth)
             {
                 _currentHealth = _maxHealth;
             }
@@ -194,15 +301,16 @@ namespace Realmrover
             {
                 return false;
             }
-            
+
         }
 
-        private int CalculateDamageNextAbility(Skill skill)
+        private int CalculateDamageNextAbility(Skill skill, Character caster, Character receiver)
         {
             int result = skill.BaseDamage;
+            result += AttributeBasedAddedSkillDamage(skill, caster, receiver);
             result += _damageIncreaseNextAbility * skill.BaseDamage / 100;
 
-            if(_damageIncreaseNextByAbility.ContainsKey(skill))
+            if (_damageIncreaseNextByAbility.ContainsKey(skill))
             {
                 result += _damageIncreaseNextByAbility[skill] * skill.BaseDamage / 100;
 
@@ -210,15 +318,14 @@ namespace Realmrover
             return result;
         }
 
-
         private void ApplyNextBonusFromSkill(Skill skill)
         {
-            if(skill == null)
+            if (skill == null)
             {
                 return;
             }
 
-            if(skill.EnhanceNextSkill == null)
+            if (skill.EnhanceNextSkill == null)
             {
                 _damageIncreaseNextAbility += skill.EnhanceNextDamage;
                 _energyCostReductionNextAbility += skill.EnhanceNextEnergyCost;
@@ -242,21 +349,40 @@ namespace Realmrover
                 }
             }
         }
+        private void ApplyAbsorbFromSkill(Skill skill)
+        {
+            _absorb += skill.Absorb;
+            Debug.Log("Absorb is now " + _absorb);
+        }
 
-        private void ClearNextBonusAll()
+        private void ApplyReflectFromSkill(Skill skill)
+        {
+            _reflect += skill.ReflectDamage;
+        }
+
+        private void ClearNextDamageBonusAll()
         {
             _damageIncreaseNextAbility = 0;
+        }
+
+        private void ClearNextEnergyBonusAll()
+        {
             _energyCostReductionNextAbility = 0;
         }
 
-        private void ClearNextBonusBySkill(Skill skill)
+        private void ClearNextDamageBonusBySkill(Skill skill)
         {
-            if(_damageIncreaseNextByAbility.ContainsKey(skill))
+            if (_damageIncreaseNextByAbility.ContainsKey(skill))
             {
                 _damageIncreaseNextByAbility[skill] = 0;
             }
 
-            if(_energyCostReductionNextByAbility.ContainsKey(skill))
+        }
+
+        private void ClearNextEnergyBonusBySkill(Skill skill)
+        {
+
+            if (_energyCostReductionNextByAbility.ContainsKey(skill))
             {
                 _energyCostReductionNextByAbility[skill] = 0;
             }
@@ -267,7 +393,7 @@ namespace Realmrover
             var skillEnemyVFX = skill.EnemySkillPrefab;
             if (skillEnemyVFX != null)
             {
-                var spawnedEffect = Instantiate(skillEnemyVFX, IsPlayer? gameManager.Enemy.transform: gameManager.Player.transform);
+                var spawnedEffect = Instantiate(skillEnemyVFX, IsPlayer ? gameManager.Enemy.transform : gameManager.Player.transform);
                 spawnedEffect.transform.parent = null;
 
             }
@@ -297,6 +423,73 @@ namespace Realmrover
                 _animator.SetTrigger("Attack");
             }
         }
+
+        public void MakeNextMove(Character target, bool expendAllEnergy = false)
+        {
+            if (_skills.Count == 0 || IsAlive() == false)
+            {
+                return;
+            }
+
+            int index = Random.Range(0, _skills.Count);
+            var skill = _skills[index];
+
+            ActivateSkill(index, target);
+
+            _gameManager.EndTurn(this);
+        }
+        public List<Skill> Skills()
+        {
+            return _skills;
+        }
+        public void EndTurn()
+        {
+            TriggerEnergyTick();
+            TriggerAllEffectsOverTime();
+        }
+
+        private void TriggerEnergyTick()
+        {
+            _energy += _energyRegen;
+            if (_energy > _maxEnergy)
+            {
+                _energy = _maxEnergy;
+            }
+        }
+        private int AttributeBasedAddedSkillDamage(Skill skill, Character caster, Character enemy)
+        {
+            int addedDamage = 0;
+
+            addedDamage += (caster.MissingHealth() * skill.DamagePercentSelfMissingHealth/100);
+            addedDamage += (enemy.MissingHealth() * skill.DamagePercentEnemyMissingHealth/100);
+            addedDamage += (caster.AbsorbAmount() * skill.DamagePercentSelfAbsorbAmount/100);
+            addedDamage += (enemy.AbsorbAmount() * skill.DamagePercentEnemyAbsorbAmount/100);
+
+            return addedDamage;
+        }
+
+        public int MissingHealth()
+        {
+            return _maxHealth - _currentHealth;
+        }
+
+        public int AbsorbAmount()
+        {
+            return _absorb;
+        }
     }
 
+
+    public class EffectOverTurns
+    {
+        public int Amount;
+        public int Turns;
+        public Skill Source;
+        public EffectOverTurns(int amount, int turns, Skill source)
+        {
+            Amount = amount;
+            Turns = turns;
+            Source = source;
+        }
+    }
 }

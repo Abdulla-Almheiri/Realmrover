@@ -16,18 +16,40 @@ namespace Realmrover
         [Header("Direct Effects")]
         public int EnergyCost = 0;
         public int BaseDamage = 0;
+        public int SacrificeDamage = 0;
+        public bool SacrificeDamageLethal = false;
         public int Heal = 0;
         public int Absorb = 0;
         public int ReflectDamage = 0;
-        public int DamagePercentMissingHealth = 0;
-        public int DamagePercentAbsorbAmount = 0;
+        public int DamagePercentSelfMissingHealth = 0;
+        public int DamagePercentEnemyMissingHealth = 0;
+        public int DamagePercentSelfAbsorbAmount = 0;
+        public int DamagePercentEnemyAbsorbAmount = 0;
 
-        [Header("Effects per turn")]
+        [Header("Buffs per turn")]
+        public int HealPerTurn = 0;
+        public int HealTurns = 0;
+        public bool HealOverTimeStacks = false;
+        public bool HealOverTimeRefreshesDuration = true;
+
+        public int IncreaseDamageForTurns = 0;
+        public int IncreaseDamageTurns = 0;
+
+        public int ReduceDamageTakenForTurns = 0;
+        public int ReduceDamageTakenTurns = 0;
+
+        public int ReduceEnergyCostForTurns = 0;
+        public int ReduceEnergyCostTurns = 0;
+
+        [Header("Debuffs per turn")]
         public int DamagePerTurn = 0;
         public int DamageTurns = 0;
-        public int ReduceDamage = 0;
+
+        public int ReduceDamageDone = 0;
+        public int ReduceDamageDoneTurns = 0;
+
         public int IncreaseDamageTaken = 0;
-        public int DebuffTurns = 0;
+        public int IncreaseDamageTakenTurns = 0;
 
         [Header("Enhance Next Ability")]
         public int EnhanceNextDamage = 0;

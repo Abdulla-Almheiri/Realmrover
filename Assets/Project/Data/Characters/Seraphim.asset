@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Seraphim
   m_EditorClassIdentifier: 
   Level: 1
-  Health: 70
-  HealthRegen: 2
-  HealthRegenPerLevel: 0
+  Health: 100
+  HealthRegen: 5
+  HealthRegenPerLevel: 2
   MaxHealthPerLevel: 0
   Energy: 20
-  MaxEnergyPerLevel: 0
-  EnergyRegen: 2
-  EnergyRegenPerLevel: 0
+  MaxEnergyPerLevel: 3
+  EnergyRegen: 5
+  EnergyRegenPerLevel: 2
   Skills:
   - {fileID: 11400000, guid: 94b32e335699d414da494e62556a5191, type: 2}
