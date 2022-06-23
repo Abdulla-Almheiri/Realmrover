@@ -35,29 +35,14 @@ namespace Realmrover
         private Dictionary<Skill, int> _energyCostReductionNextByAbility = new Dictionary<Skill, int>();
 
         private Dictionary<Skill, EffectOverTurns> _healOverTimeEffects = new Dictionary<Skill, EffectOverTurns>();
-        private Dictionary<Skill, EffectOverTurns> _IncreaseDamageForTurnsEffects = new Dictionary<Skill, EffectOverTurns>();
+        private Dictionary<Skill, EffectOverTurns> _increaseDamageForTurnsEffects = new Dictionary<Skill, EffectOverTurns>();
         private Dictionary<Skill, EffectOverTurns> _reduceDamageTakenForTurnsEffects = new Dictionary<Skill, EffectOverTurns>();
         private Dictionary<Skill, EffectOverTurns> _reduceEnergyCostForTurnsEffects = new Dictionary<Skill, EffectOverTurns>();
 
         private Dictionary<Skill, EffectOverTurns> _damageOverTimeEffects = new Dictionary<Skill, EffectOverTurns>();
-        private Dictionary<Skill, EffectOverTurns> _damageTakenIncreaseEffects = new Dictionary<Skill, EffectOverTurns>();
+        private Dictionary<Skill, EffectOverTurns> _damageTakenIncreaseForTurnsEffects = new Dictionary<Skill, EffectOverTurns>();
 
         private Animator _animator;
-        // Start is called before the first frame update
-
-        private void Awake()
-        {
-        }
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
 
         public void Initialize(GameManager gameManager, bool updateStatsPerLevel = false)
         {
@@ -94,6 +79,11 @@ namespace Realmrover
                 return false;
             }
 
+            if(index >= _skills.Count)
+            {
+                return false;
+            }
+
             var skill = _skills[index];
 
             if (skill == null)
@@ -101,18 +91,40 @@ namespace Realmrover
                 return false;
             }
 
+            if(skill.SacrificeDamage > 0)
+            {
+                if(skill.SacrificeDamage >= _currentHealth && skill.SacrificeDamageLethal == false)
+                {
+                    return false;
+                } else
+                {
+                    TakeDamage(skill.SacrificeDamage, this, skill, true, false, true);
+                }
+            }
+
             if (HasEnergyFor(skill, out int energyCost) == false)
             {
                 return false;
             }
 
+
             _energy -= energyCost;
+            Debug.Log("Energy used :            " + energyCost);
+
             ClearNextEnergyBonusAll();
             ClearNextEnergyBonusBySkill(skill);
 
+
+
+            if (skill.ReduceEnergyCostForTurns > 0)
+            {
+                ApplyReduceEnergyCostForTurnsEffect(skill);
+            }
+
+
             if (skill.BaseDamage > 0)
             {
-                target.TakeDamage(CalculateDamageNextAbility(skill, this, target), this, _gameManager);
+                target.TakeDamage(CalculateDirectDamageNextAbility(skill, this, target), this, skill, true, true, false);
                 ClearNextDamageBonusAll();
                 ClearNextDamageBonusBySkill(skill);
 
@@ -130,7 +142,7 @@ namespace Realmrover
 
             if (skill.DamagePerTurn > 0)
             {
-
+                target.ApplyDamageOverTimeEffect(skill);
             }
 
 
@@ -143,10 +155,30 @@ namespace Realmrover
             {
                 ApplyHealOverTimeEffect(skill);
             }
+
+            if(skill.IncreaseDamageForTurns > 0)
+            {
+                ApplyDamageIncreaseForTurnsEffect(skill);
+            }
+
+            if(skill.ReduceDamageTakenForTurns > 0)
+            {
+                ApplyReduceDamageTakenForTurnsEffect(skill);
+            }
+
+            if(skill.EnhanceNextEnergyCost > 0)
+            {
+                ApplyNextEnergyReductionBonusFromSkill(skill);
+            }
+
+            if(skill.EnhanceNextDamage > 0)
+            {
+                ApplyNextDamageBonusFromSkill(skill);
+            }
+
             SpawnSkillVFX(skill, _gameManager);
 
-
-            ApplyNextBonusFromSkill(skill);
+            
             return true;
         }
 
@@ -155,6 +187,30 @@ namespace Realmrover
 
         }
 
+        public void ApplyDamageOverTimeEffect(Skill skill)
+        {
+            if (_damageOverTimeEffects.ContainsKey(skill))
+            {
+                if (skill.DamageOverTimeStacks == false)
+                {
+                    if (skill.DamageOverTimeRefreshesDuration == true)
+                    {
+                        _damageOverTimeEffects[skill].Turns = skill.DamageTurns;
+                    }
+
+                    return;
+                }
+                else
+                {
+                    _damageOverTimeEffects[skill].Amount += skill.DamagePerTurn;
+
+                }
+            }
+            else
+            {
+                _damageOverTimeEffects.Add(skill, new EffectOverTurns(skill.DamagePerTurn, skill.DamageTurns, skill));
+            }
+        }
         private void ApplyHealOverTimeEffect(Skill skill)
         {
             if(_healOverTimeEffects.ContainsKey(skill))
@@ -177,19 +233,83 @@ namespace Realmrover
                 _healOverTimeEffects.Add(skill, new EffectOverTurns(skill.HealPerTurn, skill.HealTurns, skill));
             }
         }
+        private void ApplyDamageIncreaseForTurnsEffect(Skill skill)
+        {
+            if(_increaseDamageForTurnsEffects.ContainsKey(skill) == true)
+            {
+                _increaseDamageForTurnsEffects[skill].Turns = skill.IncreaseDamageTurns;
+
+            } else
+            {
+                _increaseDamageForTurnsEffects.Add(skill, new EffectOverTurns(skill.IncreaseDamageForTurns, skill.IncreaseDamageTurns, skill));
+
+            }
+        }
+
+        private void ApplyReduceDamageTakenForTurnsEffect(Skill skill)
+        {
+            if (_reduceDamageTakenForTurnsEffects.ContainsKey(skill) == true)
+            {
+                _reduceDamageTakenForTurnsEffects[skill].Turns = skill.ReduceDamageTakenTurns;
+
+            }
+            else
+            {
+                _reduceDamageTakenForTurnsEffects.Add(skill, new EffectOverTurns(skill.ReduceDamageTakenForTurns, skill.ReduceDamageTakenTurns, skill));
+
+            }
+        }
+        private void ApplyDamageTakenIncreaseForTurnsEffect(Skill skill)
+        {
+            if (_damageTakenIncreaseForTurnsEffects.ContainsKey(skill) == true)
+            {
+                _damageTakenIncreaseForTurnsEffects[skill].Turns = skill.IncreaseDamageTakenTurns;
+            }
+            else
+            {
+                _damageTakenIncreaseForTurnsEffects.Add(skill, new EffectOverTurns(skill.IncreaseDamageTakenForTurns, skill.IncreaseDamageTakenTurns, skill));
+            }
+        }
+        private void ApplyReduceEnergyCostForTurnsEffect(Skill skill)
+        {
+            if (_reduceEnergyCostForTurnsEffects.ContainsKey(skill) == true)
+            {
+                _reduceEnergyCostForTurnsEffects[skill].Turns = skill.ReduceEnergyCostTurns;
+            }
+            else
+            {
+                _reduceEnergyCostForTurnsEffects.Add(skill, new EffectOverTurns(skill.ReduceEnergyCostForTurns, skill.ReduceEnergyCostTurns, skill));
+            }
+        }
+
         private void TriggerAllEffectsOverTime()
         {
+            if (IsAlive() == false)
+            {
+                return;
+            }
+
+            TriggerReduceEnergyCostForTurnsEffects();
+            TriggerIncreaseDamageTakenForTurnsEffects();
+            TriggerReduceDamageTakenEffects();
+            TriggerIncreaseDamageDoneEffects();
             TriggerHealOverTimeEffects();
+            TriggerDamageOverTimeEffects();
         }
 
         private void TriggerHealOverTimeEffects()
         {
-            if(_healOverTimeEffects.Count == 0)
+            if (IsAlive() == false)
             {
-                Debug.Log("NO HEAL OVER TIME ADDED");
                 return;
             }
-            var values = _healOverTimeEffects.Values;
+
+            if (_healOverTimeEffects.Count == 0)
+            {
+                //Debug.Log("NO HEAL OVER TIME ADDED");
+                return;
+            }
+            var values = new List<EffectOverTurns>(_healOverTimeEffects.Values);
             foreach (EffectOverTurns effect in values)
             {
                 if(effect.Turns == 0 )
@@ -202,28 +322,133 @@ namespace Realmrover
             }
 
         }
-        public void TakeDamage(int amount, Character attacker, bool ignoreReflect = false)
+        private void TriggerDamageOverTimeEffects()
         {
             if (IsAlive() == false)
             {
                 return;
             }
 
+            if (_damageOverTimeEffects.Count == 0)
+            {
+                //Debug.Log("NO Damage OVER TIME ADDED");
+                return;
+            }
+            var values = new List<EffectOverTurns>(_damageOverTimeEffects.Values);
+            foreach (EffectOverTurns effect in values)
+            {
+                if (effect.Turns == 0)
+                {
+                    _damageOverTimeEffects.Remove(effect.Source);
+                    continue;
+                }
+                var attacker = IsPlayer ? _gameManager.Enemy.GetComponent<Character>() : _gameManager.Player.GetComponent<Character>();
+                TakeDamage(effect.Amount, attacker, effect.Source, true, false, false) ;
+                effect.Turns--;
+            }
+        }
+
+        private void TriggerIncreaseDamageDoneEffects()
+        {
+            var values = new List<EffectOverTurns>(_increaseDamageForTurnsEffects.Values);
+            foreach (EffectOverTurns effect in values)
+            {
+                if (effect.Turns <= 0)
+                {
+                    _increaseDamageForTurnsEffects.Remove(effect.Source);
+                }
+                else
+                {
+                    effect.Turns--;
+                }
+            }
+        }
+
+        private void TriggerReduceDamageTakenEffects()
+        {
+            var values = new List<EffectOverTurns>(_reduceDamageTakenForTurnsEffects.Values);
+            foreach (EffectOverTurns effect in values)
+            {
+                if (effect.Turns <= 0)
+                {
+                    _reduceDamageTakenForTurnsEffects.Remove(effect.Source);
+                }
+                else
+                {
+                    effect.Turns--;
+                }
+            }
+        }
+        private void TriggerIncreaseDamageTakenForTurnsEffects()
+        {
+            var values = new List<EffectOverTurns>(_damageTakenIncreaseForTurnsEffects.Values);
+            foreach (EffectOverTurns effect in values)
+            {
+                if (effect.Turns <= 0)
+                {
+                    _damageTakenIncreaseForTurnsEffects.Remove(effect.Source);
+                    Debug.Log("Damage taken increase removed.");
+                }
+                else
+                {
+                    Debug.Log("Turns reduced to : " + (effect.Turns - 1));
+                    effect.Turns--;
+                }
+            }
+        }
+        private void TriggerReduceEnergyCostForTurnsEffects()
+        {
+            var values = new List<EffectOverTurns>(_reduceEnergyCostForTurnsEffects.Values);
+            foreach (EffectOverTurns effect in values)
+            {
+                if (effect.Turns <= 0)
+                {
+                    _reduceEnergyCostForTurnsEffects.Remove(effect.Source);
+                }
+                else
+                {
+                    effect.Turns--;
+                }
+            }
+        }
+        public void TakeDamage(int amount, Character attacker, Skill skill, bool ignoreReflect = false, bool isDirect = true, bool ignoreAbsorb=false)
+        {
+            if (IsAlive() == false)
+            {
+                return;
+            }
+
+            if (skill.IncreaseDamageTakenForTurns > 0 && isDirect == true)
+            {
+                ApplyDamageTakenIncreaseForTurnsEffect(skill);
+                Debug.Log("APPLIED IN TAKEDAMAGE");
+            }
+
+            if (ignoreAbsorb == false)
+            {
+                amount = (amount * CalculateMultiplierReduceDamageTakenForTurnsEffects()) / 100;
+
+                //calculate DamageTakenIncreaseForTurnsEffect here
+                amount = amount * ((100 + CalculateMultiplierIncreaseDamageTakenForTurnsEffects()) / 100);
+            }
+
             if (_reflect > 0 && ignoreReflect == false)
             {
+                
                 if (_reflect >= amount)
                 {
-                    attacker.TakeDamage(amount, this, true);
+                    Debug.Log("Amount of damage to be reflected is : " + amount);
+                    attacker.TakeDamage(amount, this, skill, true, false, true);
                     _reflect -= amount;
                 } else
                 {
-                    attacker.TakeDamage(_reflect, this, true);
+                    attacker.TakeDamage(_reflect, this, skill,  true, false, true);
                     _reflect = 0;
                 }
 
             }
 
-            if (_absorb > 0)
+            if (_absorb > 0 && ignoreAbsorb == false)
             {
                 int originalAmount = amount;
                 amount -= _absorb;
@@ -289,9 +514,18 @@ namespace Realmrover
             {
                 costReductionNextByAbility = _energyCostReductionNextByAbility[skill];
             }
+       
+            finalCost *= 10000;
+            finalCost = finalCost * ((100 - _energyCostReductionNextAbility) )/ 100;
+            finalCost = finalCost * ((100 - costReductionNextByAbility)) / 100;
+            finalCost = finalCost * ((100 - CalculateMultiplierEnergyCostReductionForTurnsEffects())) / 100;
+            finalCost /= 10000;
 
-            finalCost = finalCost - (_energyCostReductionNextAbility * skill.EnergyCost / 100);
-            finalCost = finalCost - (costReductionNextByAbility * skill.EnergyCost / 100);
+            /*finalCost = finalCost - ((100 - _energyCostReductionNextAbility) * finalCost) / 100;
+            finalCost = finalCost - ((100 - costReductionNextByAbility) * finalCost) / 100;
+            finalCost = finalCost - ((100 - CalculateMultiplierEnergyCostReductionForTurnsEffects()) * finalCost)/ 100;
+            */
+
             finalEnergyCost = finalCost;
 
             if (_energy >= finalCost)
@@ -304,7 +538,7 @@ namespace Realmrover
 
         }
 
-        private int CalculateDamageNextAbility(Skill skill, Character caster, Character receiver)
+        private int CalculateDirectDamageNextAbility(Skill skill, Character caster, Character receiver)
         {
             int result = skill.BaseDamage;
             result += AttributeBasedAddedSkillDamage(skill, caster, receiver);
@@ -312,13 +546,93 @@ namespace Realmrover
 
             if (_damageIncreaseNextByAbility.ContainsKey(skill))
             {
-                result += _damageIncreaseNextByAbility[skill] * skill.BaseDamage / 100;
+                result += (_damageIncreaseNextByAbility[skill] * skill.BaseDamage) / 100;
 
             }
+
+
+           result += skill.BaseDamage * CalculateMultiplierDamageIncreaseForTurnsEffects() /100;
+
+            return result;
+        }
+        private int CalculateMultiplierReduceDamageTakenForTurnsEffects()
+        {
+            int result = 100;
+            foreach(EffectOverTurns effect in _reduceDamageTakenForTurnsEffects.Values)
+            {
+                result = result * (100-effect.Amount)/100;
+            }
+
+            return result;
+        }
+        private int CalculateMultiplierIncreaseDamageTakenForTurnsEffects()
+        {
+            int result = 0;
+            foreach (EffectOverTurns effect in _damageTakenIncreaseForTurnsEffects.Values)
+            {
+                result += effect.Amount;
+            }
+
+            Debug.Log("Multiplier calculated to be : " + result);
             return result;
         }
 
-        private void ApplyNextBonusFromSkill(Skill skill)
+        private int CalculateMultiplierDamageIncreaseForTurnsEffects()
+        {
+            int result = 0;
+            if(_increaseDamageForTurnsEffects.Count == 0)
+            {
+                return 0;
+            }
+
+            foreach(EffectOverTurns effect in _increaseDamageForTurnsEffects.Values)
+            {
+                result += effect.Amount;
+            }
+
+            
+            return result;
+        }
+        private int CalculateMultiplierEnergyCostReductionForTurnsEffects()
+        {
+            int result = 100;
+            if (_reduceEnergyCostForTurnsEffects.Count == 0)
+            {
+                return 0;
+            }
+
+            foreach (EffectOverTurns effect in _reduceEnergyCostForTurnsEffects.Values)
+            {
+                result =  result * (100-effect.Amount)/100;
+            }
+
+
+            return result;
+        }
+        private void ApplyNextEnergyReductionBonusFromSkill(Skill skill)
+        {
+            if (skill == null)
+            {
+                return;
+            }
+
+            if (skill.EnhanceNextSkill == null)
+            {
+                _energyCostReductionNextAbility = skill.EnhanceNextEnergyCost;
+            } else
+            {
+
+                if (_energyCostReductionNextByAbility.ContainsKey(skill.EnhanceNextSkill))
+                {
+                    _energyCostReductionNextByAbility[skill.EnhanceNextSkill] += skill.EnhanceNextEnergyCost;
+                }
+                else
+                {
+                    _energyCostReductionNextByAbility.Add(skill.EnhanceNextSkill, skill.EnhanceNextEnergyCost);
+                }
+            }
+        }
+        private void ApplyNextDamageBonusFromSkill(Skill skill)
         {
             if (skill == null)
             {
@@ -328,24 +642,17 @@ namespace Realmrover
             if (skill.EnhanceNextSkill == null)
             {
                 _damageIncreaseNextAbility += skill.EnhanceNextDamage;
-                _energyCostReductionNextAbility += skill.EnhanceNextEnergyCost;
-            } else
+            }
+            else
             {
-                if (_damageIncreaseNextByAbility.ContainsKey(skill))
+                if (_damageIncreaseNextByAbility.ContainsKey(skill.EnhanceNextSkill))
                 {
-                    _damageIncreaseNextByAbility[skill] += skill.EnhanceNextDamage;
-                } else
-                {
-                    _damageIncreaseNextByAbility.Add(skill, skill.EnhanceNextDamage);
-                }
-
-                if (_energyCostReductionNextByAbility.ContainsKey(skill))
-                {
-                    _energyCostReductionNextByAbility[skill] += skill.EnhanceNextEnergyCost;
+                    _damageIncreaseNextByAbility[skill.EnhanceNextSkill] += skill.EnhanceNextDamage;
                 }
                 else
                 {
-                    _energyCostReductionNextByAbility.Add(skill, skill.EnhanceNextEnergyCost);
+                    _damageIncreaseNextByAbility.Add(skill.EnhanceNextSkill, skill.EnhanceNextDamage);
+                    Debug.Log(skill.Name + "  has just added +" + skill.EnhanceNextDamage + "% damage to " + skill.EnhanceNextSkill.Name);
                 }
             }
         }
@@ -381,7 +688,6 @@ namespace Realmrover
 
         private void ClearNextEnergyBonusBySkill(Skill skill)
         {
-
             if (_energyCostReductionNextByAbility.ContainsKey(skill))
             {
                 _energyCostReductionNextByAbility[skill] = 0;
@@ -444,18 +750,35 @@ namespace Realmrover
         }
         public void EndTurn()
         {
+            TriggerHealthRegenTick();
             TriggerEnergyTick();
             TriggerAllEffectsOverTime();
         }
 
         private void TriggerEnergyTick()
         {
+            if(IsAlive() == false)
+            {
+                return;
+            }
+
             _energy += _energyRegen;
             if (_energy > _maxEnergy)
             {
                 _energy = _maxEnergy;
             }
         }
+
+        private void TriggerHealthRegenTick()
+        {
+            if (IsAlive() == false)
+            {
+                return;
+            }
+
+            Heal(_healthRegen);
+        }
+
         private int AttributeBasedAddedSkillDamage(Skill skill, Character caster, Character enemy)
         {
             int addedDamage = 0;

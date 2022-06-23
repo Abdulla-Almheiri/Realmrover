@@ -10,25 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29d0d1a242dcfef48aa731feb6cbd188, type: 3}
-  m_Name: Prayer
+  m_Name: Holy Slash
   m_EditorClassIdentifier: 
-  Icon: {fileID: 21300000, guid: da1a1f9880e395541b44f308a46add18, type: 3}
-  Name: Prayer
-  Description: Heals for 15 plus 15 over 3 turns.
+  Icon: {fileID: 21300000, guid: 5a3c4ecbe8510d8468707c00e2e06823, type: 3}
+  Name: Holy Slash
+  Description: Deals 10 damage plus 8 over 4 turns.
   Level: 1
-  EnergyCost: 8
-  BaseDamage: 0
+  EnergyCost: 4
+  EnergyGain: 0
+  BaseDamage: 10
   SacrificeDamage: 0
   SacrificeDamageLethal: 0
-  Heal: 15
+  Heal: 0
   Absorb: 0
   ReflectDamage: 0
   DamagePercentSelfMissingHealth: 0
   DamagePercentEnemyMissingHealth: 0
   DamagePercentSelfAbsorbAmount: 0
   DamagePercentEnemyAbsorbAmount: 0
-  HealPerTurn: 5
-  HealTurns: 3
+  HealPerTurn: 0
+  HealTurns: 0
   HealOverTimeStacks: 0
   HealOverTimeRefreshesDuration: 1
   IncreaseDamageForTurns: 0
@@ -37,15 +38,17 @@ MonoBehaviour:
   ReduceDamageTakenTurns: 0
   ReduceEnergyCostForTurns: 0
   ReduceEnergyCostTurns: 0
-  DamagePerTurn: 0
-  DamageTurns: 0
+  DamagePerTurn: 2
+  DamageTurns: 4
+  DamageOverTimeStacks: 0
+  DamageOverTimeRefreshesDuration: 1
   ReduceDamageDone: 0
   ReduceDamageDoneTurns: 0
-  IncreaseDamageTaken: 0
-  IncreaseDamageTakenTurns: 0
+  IncreaseDamageTakenForTurns: 100
+  IncreaseDamageTakenTurns: 3
   EnhanceNextDamage: 0
   EnhanceNextEnergyCost: 0
   EnhanceNextSkill: {fileID: 0}
-  EnemySkillPrefab: {fileID: 0}
+  EnemySkillPrefab: {fileID: 1140688198521842132, guid: 680dcce460fab3549ac0dcf92ce1fa33, type: 3}
   SelfSkillPrefab: {fileID: 0}
-  AnimationType: 1
+  AnimationType: 0

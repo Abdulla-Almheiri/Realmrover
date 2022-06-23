@@ -15,6 +15,7 @@ namespace Realmrover
 
         [Header("Direct Effects")]
         public int EnergyCost = 0;
+        public int EnergyGain = 0;
         public int BaseDamage = 0;
         public int SacrificeDamage = 0;
         public bool SacrificeDamageLethal = false;
@@ -44,11 +45,13 @@ namespace Realmrover
         [Header("Debuffs per turn")]
         public int DamagePerTurn = 0;
         public int DamageTurns = 0;
+        public bool DamageOverTimeStacks = false;
+        public bool DamageOverTimeRefreshesDuration = true;
 
         public int ReduceDamageDone = 0;
         public int ReduceDamageDoneTurns = 0;
 
-        public int IncreaseDamageTaken = 0;
+        public int IncreaseDamageTakenForTurns = 0;
         public int IncreaseDamageTakenTurns = 0;
 
         [Header("Enhance Next Ability")]

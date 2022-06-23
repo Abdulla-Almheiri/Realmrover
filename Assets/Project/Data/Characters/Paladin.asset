@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Level: 1
   Health: 40
-  HealthRegen: 0
-  HealthRegenPerLevel: 0
+  HealthRegen: 4
+  HealthRegenPerLevel: 1
   MaxHealthPerLevel: 4
   Energy: 20
   MaxEnergyPerLevel: 2
@@ -26,3 +26,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1c667f69d64372d4186a43125b15b1e1, type: 2}
   - {fileID: 11400000, guid: ab9663710eee0a0408334fdc3c450f87, type: 2}
   - {fileID: 11400000, guid: 715e2cb08c1944a479f9437f4d6b0bb4, type: 2}
+  - {fileID: 11400000, guid: f6aaebaa4fb5c2849bee9b93ce9f73ba, type: 2}
+  - {fileID: 11400000, guid: 80c0c0200a7604c4b83ce9a53588c2a4, type: 2}

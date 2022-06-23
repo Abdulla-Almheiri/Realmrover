@@ -126,6 +126,30 @@ namespace Realmrover
                     TriggerAbilityRecharge();
                 }
             }
+
+            if (Input.GetKeyDown(KeyCode.Alpha5))
+            {
+                if (_player.ActivateSkill(4, _enemy) == true)
+                {
+                    TriggerAbilityRecharge();
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha6))
+            {
+                if (_player.ActivateSkill(5, _enemy) == true)
+                {
+                    TriggerAbilityRecharge();
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha7))
+            {
+                if (_player.ActivateSkill(6, _enemy) == true)
+                {
+                    TriggerAbilityRecharge();
+                }
+            }
         }
 
         private void TriggerAbilityRecharge(float rechargeTime = 1f)
