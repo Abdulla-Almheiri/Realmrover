@@ -21,5 +21,6 @@ MonoBehaviour:
   MaxEnergyPerLevel: 2
   EnergyRegen: 2
   EnergyRegenPerLevel: 1
+  AnimationData: {fileID: 22100000, guid: ee7217c9e6014c6489d9a676cfbc60b5, type: 2}
   Skills:
   - {fileID: 11400000, guid: 6a24a79f2de637b4c8d9d107a0a83fa8, type: 2}

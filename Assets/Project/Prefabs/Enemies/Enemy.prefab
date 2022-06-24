@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &971680748741051436
+--- !u!1 &1289010375048162272
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,39 +8,39 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3935350520011505614}
-  - component: {fileID: 9092037741721303402}
-  - component: {fileID: 6349912004695961297}
-  - component: {fileID: 7375395303573435195}
-  m_Layer: 10
-  m_Name: SmiteVFX
+  - component: {fileID: 1289010375048162275}
+  - component: {fileID: 1289010375048162274}
+  - component: {fileID: 1289010375048162273}
+  - component: {fileID: 1289010375048162284}
+  m_Layer: 0
+  m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3935350520011505614
+--- !u!4 &1289010375048162275
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 971680748741051436}
+  m_GameObject: {fileID: 1289010375048162272}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &9092037741721303402
+--- !u!212 &1289010375048162274
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 971680748741051436}
+  m_GameObject: {fileID: 1289010375048162272}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -72,31 +72,31 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -48752223
+  m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: -327192219, guid: b27077d78819a744796dbedbb361bf90, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 16, y: 16.046875}
+  m_Size: {x: 8, y: 8}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &6349912004695961297
+--- !u!95 &1289010375048162273
 Animator:
   serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 971680748741051436}
+  m_GameObject: {fileID: 1289010375048162272}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: f80c4d5ca5a69af40b82af33a663721a, type: 2}
+  m_Controller: {fileID: 22100000, guid: ee7217c9e6014c6489d9a676cfbc60b5, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -106,16 +106,17 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &7375395303573435195
+--- !u!114 &1289010375048162284
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 971680748741051436}
+  m_GameObject: {fileID: 1289010375048162272}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f886309ef419954c9cdf858035027f1, type: 3}
+  m_Script: {fileID: 11500000, guid: cec3a9ae1cb8c3349b4568a96126becd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Seconds: 5
+  CharacterTemplate: {fileID: 11400000, guid: 73414b0208af8b04ea9ec9b85c2bf285, type: 2}
+  IsPlayer: 0

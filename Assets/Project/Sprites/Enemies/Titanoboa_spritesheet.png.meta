@@ -541,6 +541,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Titanoboa_spritesheet_18
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 768
+        height: 512
+      alignment: 9
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc799e99b0ec4e444bc3ec42aa7a9ac9
+      internalID: 864340188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -557,6 +578,7 @@ TextureImporter:
       Titanoboa_spritesheet_10: 1065483242
       Titanoboa_spritesheet_13: -1073487870
       Titanoboa_spritesheet_7: -128775803
+      Titanoboa_spritesheet_18: 864340188
       Titanoboa_spritesheet_12: -861094615
       Titanoboa_spritesheet_2: -284053523
       Titanoboa_spritesheet_17: 1812211122

@@ -25,7 +25,7 @@ namespace Realmrover
         public void UpdateSkillUI()
         {
             int index = 0;
-            var player = GameManager.Player.GetComponent<Character>();
+            var player = GameManager.CurrentPlayerCharacter();
 
             foreach(Image img in Images)
             {

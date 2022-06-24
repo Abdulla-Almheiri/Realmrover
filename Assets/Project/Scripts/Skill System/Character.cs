@@ -6,11 +6,11 @@ namespace Realmrover
 {
     public class Character : MonoBehaviour
     {
-        public CharacterTemplate CharacterTemplate = null;
         private int _level = 1;
         private bool _alive = false;
         public bool IsPlayer = false;
         private GameManager _gameManager;
+        private CharacterTemplate _template;
 
         private int _maxHealthPerLevel = 0;
         private int _maxEnergyPerLevel = 0;
@@ -44,32 +44,43 @@ namespace Realmrover
 
         private Animator _animator;
 
-        public void Initialize(GameManager gameManager, bool updateStatsPerLevel = false)
+        private void Update()
+        {
+            if(Input.GetKeyDown(KeyCode.T))
+            {
+                Debug.Log("T PRESSED");
+                ClearHealOverTimeEffects();
+            }
+        }
+        public void Initialize(CharacterTemplate template, GameManager gameManager, int level = 1, bool isPlayer = false)
         {
             _gameManager = gameManager;
-            if (CharacterTemplate == null)
+            if (template == null)
             {
                 return;
             }
-
+            _template = template;
+            _level = level;
             _alive = true;
+            IsPlayer = isPlayer;
 
-            _maxHealthPerLevel = CharacterTemplate.MaxHealthPerLevel;
-            _maxEnergyPerLevel = CharacterTemplate.MaxHealthPerLevel;
-            _EnergyRegenPerLevel = CharacterTemplate.EnergyRegenPerLevel;
-            _HealthRegenPerLevel = CharacterTemplate.HealthRegenPerLevel;
+            _maxHealthPerLevel = template.MaxHealthPerLevel;
+            _maxEnergyPerLevel = template.MaxHealthPerLevel;
+            _EnergyRegenPerLevel = template.EnergyRegenPerLevel;
+            _HealthRegenPerLevel = template.HealthRegenPerLevel;
 
-            _level = CharacterTemplate.Level;
-            _currentHealth = CharacterTemplate.Health + (updateStatsPerLevel ? _level - 1 : 0) * _maxHealthPerLevel;
+            _level = template.Level;
+            _currentHealth = template.Health + ( _level - 1 ) * _maxHealthPerLevel;
             _maxHealth = _currentHealth;
-            _healthRegen = CharacterTemplate.HealthRegen + (updateStatsPerLevel ? _level - 1 : 0) * _HealthRegenPerLevel;
-            _energy = CharacterTemplate.Energy + (updateStatsPerLevel ? _level - 1 : 0) * _maxEnergyPerLevel;
+            _healthRegen = template.HealthRegen + ( _level - 1 ) * _HealthRegenPerLevel;
+            _energy = template.Energy + ( _level - 1 ) * _maxEnergyPerLevel;
             _maxEnergy = _energy;
-            _energyRegen = CharacterTemplate.EnergyRegen + (updateStatsPerLevel ? _level - 1 : 0) * _EnergyRegenPerLevel;
+            _energyRegen = template.EnergyRegen + ( _level - 1 ) * _EnergyRegenPerLevel;
 
-            _skills = new List<Skill>(CharacterTemplate.Skills);
+            _skills = new List<Skill>(template.Skills);
 
             _animator = GetComponent<Animator>();
+            _animator.runtimeAnimatorController = template.AnimationData;
         }
 
         public bool ActivateSkill(int index, Character target)
@@ -91,6 +102,11 @@ namespace Realmrover
                 return false;
             }
 
+            if(target == null)
+            {
+                return false;
+            }
+
             if(skill.SacrificeDamage > 0)
             {
                 if(skill.SacrificeDamage >= _currentHealth && skill.SacrificeDamageLethal == false)
@@ -98,7 +114,7 @@ namespace Realmrover
                     return false;
                 } else
                 {
-                    TakeDamage(skill.SacrificeDamage, this, skill, true, false, true);
+                    TakeDamage(skill.SacrificeDamage, FloatingTextType.SACRIFICE,this, skill, true, false, true);
                 }
             }
 
@@ -124,7 +140,7 @@ namespace Realmrover
 
             if (skill.BaseDamage > 0)
             {
-                target.TakeDamage(CalculateDirectDamageNextAbility(skill, this, target), this, skill, true, true, false);
+                target.TakeDamage(CalculateDirectDamageNextAbility(skill, this, target), FloatingTextType.DIRECT_DAMAGE,this, skill, false, true, false);
                 ClearNextDamageBonusAll();
                 ClearNextDamageBonusBySkill(skill);
 
@@ -148,7 +164,7 @@ namespace Realmrover
 
             if (skill.Heal > 0)
             {
-                Heal(skill.Heal);
+                Heal(skill.Heal, FloatingTextType.DIRECT_HEAL);
             }
 
             if(skill.HealPerTurn > 0)
@@ -317,7 +333,7 @@ namespace Realmrover
                     _healOverTimeEffects.Remove(effect.Source);
                     continue;
                 }
-                Heal(effect.Amount);
+                Heal(effect.Amount, FloatingTextType.HEAL_PER_TURN);
                 effect.Turns--;
             }
 
@@ -342,8 +358,8 @@ namespace Realmrover
                     _damageOverTimeEffects.Remove(effect.Source);
                     continue;
                 }
-                var attacker = IsPlayer ? _gameManager.Enemy.GetComponent<Character>() : _gameManager.Player.GetComponent<Character>();
-                TakeDamage(effect.Amount, attacker, effect.Source, true, false, false) ;
+                var attacker = IsPlayer ? _gameManager.EnemyPrefab.GetComponent<Character>() : _gameManager.PlayerPrefab.GetComponent<Character>();
+                TakeDamage(effect.Amount, FloatingTextType.DAMAGE_PER_TURN,attacker, effect.Source, true, false, false) ;
                 effect.Turns--;
             }
         }
@@ -411,7 +427,7 @@ namespace Realmrover
                 }
             }
         }
-        public void TakeDamage(int amount, Character attacker, Skill skill, bool ignoreReflect = false, bool isDirect = true, bool ignoreAbsorb=false)
+        public void TakeDamage(int amount, FloatingTextType type, Character attacker, Skill skill, bool ignoreReflect = false, bool isDirect = true, bool ignoreAbsorb=false)
         {
             if (IsAlive() == false)
             {
@@ -438,11 +454,11 @@ namespace Realmrover
                 if (_reflect >= amount)
                 {
                     Debug.Log("Amount of damage to be reflected is : " + amount);
-                    attacker.TakeDamage(amount, this, skill, true, false, true);
+                    attacker.TakeDamage(amount, FloatingTextType.REFLECT, this, skill, true, false, true);
                     _reflect -= amount;
                 } else
                 {
-                    attacker.TakeDamage(_reflect, this, skill,  true, false, true);
+                    attacker.TakeDamage(_reflect, FloatingTextType.REFLECT, this, skill,  true, false, true);
                     _reflect = 0;
                 }
 
@@ -464,8 +480,15 @@ namespace Realmrover
             }
 
             _currentHealth -= amount;
-            Debug.Log(amount + " damage taken by " + this.CharacterTemplate.name + ". Health is : " + _currentHealth + "/" + _maxHealth);
-            _gameManager.SpawnDamageNumber(amount, attacker.IsPlayer);
+            Debug.Log(amount + " damage taken by " + this._template.name + ". Health is : " + _currentHealth + "/" + _maxHealth);
+
+            bool spawnAtEnemy = !IsPlayer;
+            if(type == FloatingTextType.SACRIFICE)
+            {
+                spawnAtEnemy = !spawnAtEnemy;
+            }
+            
+            _gameManager.SpawnDamageNumber(amount, type, spawnAtEnemy);
             _animator.SetTrigger("Hit");
             CheckDead();
         }
@@ -480,9 +503,12 @@ namespace Realmrover
             }
         }
 
-        public void Heal(int amount)
+        public void Heal(int amount, FloatingTextType textType, bool showFloatingText = true)
         {
-            _gameManager.SpawnDamageNumber(amount, false);
+            if (showFloatingText == true)
+            {
+                _gameManager.SpawnDamageNumber(amount, textType , !IsPlayer);
+            }
             _currentHealth += amount;
 
             if (_currentHealth > _maxHealth)
@@ -693,13 +719,40 @@ namespace Realmrover
                 _energyCostReductionNextByAbility[skill] = 0;
             }
         }
+        private bool ClearHealOverTimeEffects(Skill skill = null)
+        {
+            if (skill != null)
+            {
+                return _healOverTimeEffects.Remove(skill);
+            } else
+            {
+                bool status = _healOverTimeEffects.Count > 0;
+                _healOverTimeEffects.Clear();
+                Debug.Log("HEAL OVER TIME CLEARED. SKILL NULL.");
+                return status;
+            }
+        }
+
+        private bool ClearDamageOverTimeEffects(Skill skill = null)
+        {
+            if (skill != null)
+            {
+                return _damageOverTimeEffects.Remove(skill);
+            }
+            else
+            {
+                bool status = _damageOverTimeEffects.Count > 0;
+                _damageOverTimeEffects.Clear();
+                return status;
+            }
+        }
 
         private void SpawnSkillVFX(Skill skill, GameManager gameManager)
         {
             var skillEnemyVFX = skill.EnemySkillPrefab;
             if (skillEnemyVFX != null)
             {
-                var spawnedEffect = Instantiate(skillEnemyVFX, IsPlayer ? gameManager.Enemy.transform : gameManager.Player.transform);
+                var spawnedEffect = Instantiate(skillEnemyVFX, IsPlayer ? gameManager.EnemySpawnPoint : gameManager.PlayerSpawnPoint);
                 spawnedEffect.transform.parent = null;
 
             }
@@ -754,7 +807,10 @@ namespace Realmrover
             TriggerEnergyTick();
             TriggerAllEffectsOverTime();
         }
+        public void EndBattle()
+        {
 
+        }
         private void TriggerEnergyTick()
         {
             if(IsAlive() == false)
@@ -776,7 +832,7 @@ namespace Realmrover
                 return;
             }
 
-            Heal(_healthRegen);
+            Heal(_healthRegen, FloatingTextType.HEALTH_REGEN);
         }
 
         private int AttributeBasedAddedSkillDamage(Skill skill, Character caster, Character enemy)
