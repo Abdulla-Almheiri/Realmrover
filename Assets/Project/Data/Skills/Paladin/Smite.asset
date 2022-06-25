@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29d0d1a242dcfef48aa731feb6cbd188, type: 3}
   m_Name: Smite
   m_EditorClassIdentifier: 
-  Icon: {fileID: 21300000, guid: 96825db2d6082d644a54c199c8ccbbb4, type: 3}
+  Icon: {fileID: 21300000, guid: 832d42f134570534f97f8e44f46e316e, type: 3}
   Name: Smite
   Description: Deals 15 damage.
   Level: 1

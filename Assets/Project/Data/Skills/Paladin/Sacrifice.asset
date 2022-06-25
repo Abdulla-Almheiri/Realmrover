@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29d0d1a242dcfef48aa731feb6cbd188, type: 3}
   m_Name: Sacrifice
   m_EditorClassIdentifier: 
-  Icon: {fileID: 21300000, guid: 51dcffcf3e29c6f4d8ba23070ee623ca, type: 3}
+  Icon: {fileID: 21300000, guid: f042af5439350ae43aee41a4824b3ea9, type: 3}
   Name: Sacrifice
   Description: Sacrifices 10 Health to deal 20 damage to the enemy.
   Level: 1

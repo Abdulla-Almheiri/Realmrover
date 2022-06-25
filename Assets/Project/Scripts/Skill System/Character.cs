@@ -48,7 +48,6 @@ namespace Realmrover
         {
             if(Input.GetKeyDown(KeyCode.T))
             {
-                Debug.Log("T PRESSED");
                 ClearHealOverTimeEffects();
             }
         }
@@ -322,7 +321,6 @@ namespace Realmrover
 
             if (_healOverTimeEffects.Count == 0)
             {
-                //Debug.Log("NO HEAL OVER TIME ADDED");
                 return;
             }
             var values = new List<EffectOverTurns>(_healOverTimeEffects.Values);
@@ -347,7 +345,6 @@ namespace Realmrover
 
             if (_damageOverTimeEffects.Count == 0)
             {
-                //Debug.Log("NO Damage OVER TIME ADDED");
                 return;
             }
             var values = new List<EffectOverTurns>(_damageOverTimeEffects.Values);
@@ -403,11 +400,9 @@ namespace Realmrover
                 if (effect.Turns <= 0)
                 {
                     _damageTakenIncreaseForTurnsEffects.Remove(effect.Source);
-                    Debug.Log("Damage taken increase removed.");
                 }
                 else
                 {
-                    Debug.Log("Turns reduced to : " + (effect.Turns - 1));
                     effect.Turns--;
                 }
             }
@@ -437,7 +432,6 @@ namespace Realmrover
             if (skill.IncreaseDamageTakenForTurns > 0 && isDirect == true)
             {
                 ApplyDamageTakenIncreaseForTurnsEffect(skill);
-                Debug.Log("APPLIED IN TAKEDAMAGE");
             }
 
             if (ignoreAbsorb == false)
@@ -453,7 +447,6 @@ namespace Realmrover
                 
                 if (_reflect >= amount)
                 {
-                    Debug.Log("Amount of damage to be reflected is : " + amount);
                     attacker.TakeDamage(amount, FloatingTextType.REFLECT, this, skill, true, false, true);
                     _reflect -= amount;
                 } else
@@ -480,7 +473,6 @@ namespace Realmrover
             }
 
             _currentHealth -= amount;
-            Debug.Log(amount + " damage taken by " + this._template.name + ". Health is : " + _currentHealth + "/" + _maxHealth);
 
             bool spawnAtEnemy = !IsPlayer;
             if(type == FloatingTextType.SACRIFICE)
@@ -500,6 +492,8 @@ namespace Realmrover
                 _alive = false;
                 _currentHealth = 0;
                 _animator.SetTrigger("Death");
+                Debug.Log("Animator Death");
+                _gameManager.CharacterDead(this);
             }
         }
 

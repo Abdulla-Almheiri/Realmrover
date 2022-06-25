@@ -404,7 +404,9 @@ MonoBehaviour:
   EnemyPrefab: {fileID: 1289010375048162272, guid: 2806d50adbcf7c247a505a990ee923cc, type: 3}
   StartingEnemyTemplate: {fileID: 11400000, guid: 73414b0208af8b04ea9ec9b85c2bf285, type: 2}
   PlayerHUDPrefab: {fileID: 8532402038284902414, guid: 5acee62552e8edd4187da9c70733807a, type: 3}
+  SkillBarPrefab: {fileID: 6946438301874630151, guid: 6f03c7f5bc4b88441b048392ed09efee, type: 3}
   BattleBackgroundPrefab: {fileID: 2944895164852501282, guid: 35c87194d5b58344ab9e9908c2c37283, type: 3}
+  BattleControlButtonPrefab: {fileID: 6828634866206163573, guid: 930135119b129a043800cdd2259315d3, type: 3}
   DamageNumberUIPrefab: {fileID: 6228871698173905664, guid: c8a2fd8c57880494fa81da7e0c81248e, type: 3}
   TextColorsPreset: {fileID: 11400000, guid: 5c0258113b3b01643885732ebce5f74c, type: 2}
 --- !u!4 &810585679

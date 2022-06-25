@@ -10,23 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29d0d1a242dcfef48aa731feb6cbd188, type: 3}
-  m_Name: Heaven's Wrath
+  m_Name: ShieldCharge
   m_EditorClassIdentifier: 
-  Icon: {fileID: 21300000, guid: f4709c328776ce242a0be4fa561c4ba1, type: 3}
-  Name: Heaven's Wrath
-  Description: Deals 20 damage plus an amount equal to 200% of your missing health
+  Icon: {fileID: 21300000, guid: 9f77221f87cb69e4e92bacc9b0ddeeba, type: 3}
+  Name: Shield Charge
+  Description: 'Shield Charge: Deals 10 damage plus 100% of your Absorb amount. 5
+    energy.'
   Level: 1
-  EnergyCost: 12
+  EnergyCost: 5
   EnergyGain: 0
-  BaseDamage: 20
+  BaseDamage: 10
   SacrificeDamage: 0
   SacrificeDamageLethal: 0
   Heal: 0
   Absorb: 0
   ReflectDamage: 0
-  DamagePercentSelfMissingHealth: 200
+  DamagePercentSelfMissingHealth: 0
   DamagePercentEnemyMissingHealth: 0
-  DamagePercentSelfAbsorbAmount: 0
+  DamagePercentSelfAbsorbAmount: 100
   DamagePercentEnemyAbsorbAmount: 0
   HealPerTurn: 0
   HealTurns: 0
@@ -49,6 +50,6 @@ MonoBehaviour:
   EnhanceNextDamage: 0
   EnhanceNextEnergyCost: 0
   EnhanceNextSkill: {fileID: 0}
-  EnemySkillPrefab: {fileID: 971680748741051436, guid: e309437427be4dc49b1cba3bcea47385, type: 3}
+  EnemySkillPrefab: {fileID: 0}
   SelfSkillPrefab: {fileID: 0}
-  AnimationType: 0
+  AnimationType: 1
