@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1289010375048162273}
   - component: {fileID: 1289010375048162284}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Character
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96,7 +96,7 @@ Animator:
   m_GameObject: {fileID: 1289010375048162272}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 22100000, guid: ee7217c9e6014c6489d9a676cfbc60b5, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -118,5 +118,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cec3a9ae1cb8c3349b4568a96126becd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CharacterTemplate: {fileID: 11400000, guid: 73414b0208af8b04ea9ec9b85c2bf285, type: 2}
   IsPlayer: 0

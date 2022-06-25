@@ -10,7 +10,7 @@ namespace Realmrover
         public string Name;
         public Sprite Background;
 
-        List<EnemyEntry> Enemies = new List<EnemyEntry>();
+        public List<EnemyEntry> Enemies = new List<EnemyEntry>();
     }
 
     [System.Serializable]

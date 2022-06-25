@@ -21,22 +21,33 @@ namespace Realmrover
         public CharacterTemplate PlayerTemplate;
 
         [Space(20)]
-        [Header("Starting Level")]
-        public GameLevel StartingLevel;
+        [Header("Main Menu")]
+        public GameObject MainMenuPrefab;
+        private MainMenuScript _mainMenu;
+
+        [Space(20)]
+        [Header("Main Map")]
+        public GameObject MainMapPrefab;
+        private MainMapScript _mainMap;
+
+        [Space(20)]
+        [Header("Levels")]
+        public List<GameLevel> Levels = new List<GameLevel>();
+        private int _currentEnemyInLevelIndex = 0;
 
         [Space(20)]
         [Header("Spawn Locations")]
         public Transform EnemySpawnPoint;
         public Transform PlayerSpawnPoint;
-        
+
 
         [Space(20)]
-        [SerializeField]
         [Header("UI: Canvas")]
+        public Canvas DynamicCanvasPrefab;
         private Canvas _dynamicCanvas;
-        [SerializeField]
+        public Canvas StaticCanvasPrefab;
         private Canvas _staticCanvas;
-        public GameObject MainMenuPrefab;
+
 
         public AnimatorOverrideController seraphim_anim;
         public Sprite seraphim_sprite;
@@ -52,11 +63,11 @@ namespace Realmrover
 
         [Space(20)]
         [Header("Battle HUD")]
-        public SliderUI PlayerHealth;
-        public SliderUI PlayerEnergy;
+        public GameObject PlayerHUDPrefab;
+        private CharacterHUDScript _playerHUD;
 
-        public SliderUI EnemyHealth;
-        public SliderUI EnemyEnergy;
+        public GameObject BattleBackgroundPrefab;
+        private BattleBackgroundScript _battleBackground;
 
         [Space(20)]
         [Header("Floating Combat Text")]
@@ -65,27 +76,26 @@ namespace Realmrover
 
         private bool _playerTurn = true;
         private float _abilityRechargeTime = 1f;
-        private int _currentEnemyIndexInLevel = 0;
         private float _turnDelayTime = 1f;
 
         
 
         private void Awake()
         {
+            Initialize();
             /*_currentPlayerCharacter = PlayerPrefab.GetComponent<Character>();
             _currentPlayerCharacter.Initialize(PlayerTemplate, this);
             /*_enemy = Enemy.GetComponent<Character>();
             _enemy.Initialize(this);
             SpawnEnemy();*/
-            SpawnCharacter(PlayerTemplate, true);
-            SpawnCharacter(StartingEnemyTemplate);
+
 
         }
         private void Update()
         {
             if(Input.GetKeyDown(KeyCode.F))
             {
-                ClearCurrentEnemy();
+                EndTurnButtonPress();
             }
 
             //test
@@ -104,55 +114,76 @@ namespace Realmrover
 
             HandleAbilityRecharge();
             HandlePlayerInput();
-            UpdateUI();
+            //UpdateUI();
+        }
+
+        private void Initialize()
+        {
+            //SpawnCharacter(PlayerTemplate, true);
+            //SpawnCharacter(StartingEnemyTemplate);
+            InitializeCanvases();
+            //InitializeBattleHUD();
+
+            StartGame();
+        }
+
+        private void InitializeCanvases()
+        {
+            _dynamicCanvas = Instantiate(DynamicCanvasPrefab);
+            _dynamicCanvas.worldCamera = Camera.main;
+            _staticCanvas = Instantiate(StaticCanvasPrefab);
+            _staticCanvas.worldCamera = Camera.main;
+        }
+        private void InitializeBattleHUD()
+        {
+            _playerHUD = Instantiate(PlayerHUDPrefab, _staticCanvas.transform).GetComponent<CharacterHUDScript>();
+            _playerHUD.Initialize(this, _currentPlayerCharacter);
         }
 
         public void UpdateUI()
         {
-            PlayerHealth.UpdateValue(_currentPlayerCharacter.HealthPercent());
-            PlayerEnergy.UpdateValue(_currentPlayerCharacter.EnergyPercent());
-            EnemyHealth.UpdateValue(_currentEnemyCharacter.HealthPercent());
-            EnemyEnergy.UpdateValue(_currentEnemyCharacter.EnergyPercent());
+            _playerHUD.UpdateStats();
+        }
 
+        public void StatsChanged()
+        {
+            UpdateUI();
         }
         public void SpawnPlayer(int level=1)
         {
             if (_currentPlayer != null)
             {
                 _currentPlayer.SetActive(true);
-                if (PlayerTemplate != null)
-                {
-                    _currentPlayerCharacter.Initialize(PlayerTemplate, this, level, true);
-                }
-                return;
+                Debug.Log("player set to active");
             }
+            else
+            {
 
-            var spawn = Instantiate(CharacterPrefab, PlayerSpawnPoint);
-            _currentPlayer = spawn;
-            _currentPlayerCharacter = spawn.GetComponent<Character>();
-            _currentPlayerCharacter.Initialize(PlayerTemplate, this, level, true);
+                var spawn = Instantiate(CharacterPrefab, PlayerSpawnPoint);
+                _currentPlayer = spawn;
+                _currentPlayerCharacter = spawn.GetComponent<Character>();
+                _currentPlayerCharacter.Initialize(PlayerTemplate, this, level, true);
+            }
         }
 
         private void SpawnEnemy(CharacterTemplate template, int level = 1)
         {
-            if(_currentEnemy != null)
+            if (_currentEnemy != null)
             {
                 _currentEnemy.SetActive(true);
-                if(template != null)
-                {
-                    _currentEnemyCharacter.Initialize(template, this, level, false);
-                }
-                return;
             }
+            else
+            {
 
-            var spawn = Instantiate(CharacterPrefab, EnemySpawnPoint);
-            _currentEnemy = spawn;
-            _currentEnemyCharacter = spawn.GetComponent<Character>();
-            _currentEnemyCharacter.Initialize(template, this, level, false);
+                var spawn = Instantiate(CharacterPrefab, EnemySpawnPoint);
+                _currentEnemy = spawn;
+                _currentEnemyCharacter = spawn.GetComponent<Character>();
+                _currentEnemyCharacter.Initialize(template, this, level, false);
+            }
         }
 
 
-        public void SpawnCharacter(CharacterTemplate template, bool IsPLayer = false )
+        public void SpawnCharacter(CharacterTemplate template, bool IsPLayer = false, int level = 1)
         {
             if(template == null)
             {
@@ -195,6 +226,8 @@ namespace Realmrover
                 _currentPlayerCharacter.EndTurn();
                 _playerTurn = true;
             }
+
+            StatsChanged();
         }
 
         public void EndTurnButtonPress()
@@ -298,9 +331,17 @@ namespace Realmrover
 
         }
 
-        public void SpawnNextEnemy()
+        public void SpawnNextEnemy(GameLevel gameLevel)
         {
-
+            if (_currentEnemyInLevelIndex >= gameLevel.Enemies.Count)
+            {
+                //Handle Next Level here
+                return;
+            }
+            else
+            {
+                SpawnCharacter(gameLevel.Enemies[_currentEnemyInLevelIndex].Template, false, gameLevel.Enemies[_currentEnemyInLevelIndex].Level);
+            }
         }
 
         private void ClearCurrentEnemy()
@@ -322,60 +363,114 @@ namespace Realmrover
             return _currentEnemyCharacter;
         }
 
-        private void StartGame()
+        public void StartGame()
         {
             ShowMainMenu();
         }
+
+        public void StartGameSession()
+        {
+            ShowMainMap();
+            HideMainMenu();
+        }
+
         private void ShowMainMenu()
         {
-
+            if(_mainMenu != null)
+            {
+                _mainMenu.gameObject.SetActive(true);
+            } else
+            {
+                _mainMenu = Instantiate(MainMenuPrefab, _staticCanvas.transform).GetComponent<MainMenuScript>();
+                _mainMenu.Initialize(this);
+            }
         }
 
         private void EnterMainMap()
         {
-
+            HideMainMenu();
+            ShowMainMap();
         }
 
-        private void EnterBattle()
+        public void StartLevel(int index)
         {
-            HideMainMenu();
+            if(Levels == null || Levels.Count <= index)
+            {
+                return;
+            }
+            EnterBattle(Levels[index]);
+
+        }
+        private void EnterBattle(GameLevel gameLevel)
+        {
             ShowLoadingScreen();
-            SpawnBattleBackground();
-            SpawnBattleHUD();
+            HideMainMap();
+            ShowBattleBackground(gameLevel);
             SpawnPlayer();
-            SpawnNextEnemy();
+            SpawnNextEnemy(gameLevel);
+            ShowBattleHUD();
+
 
             HideLoadingScreen();
         }
 
         private void LeaveBattle()
         {
-
+            HideBattleBackground();
+            HideBattleHUD();
+            EnterMainMap();
         }
 
-        private void SpawnBattleHUD()
+        private void ShowBattleHUD()
+        {
+            if (_playerHUD != null)
+            {
+                _playerHUD.gameObject.SetActive(true);
+            }
+            else
+            {
+                _playerHUD = Instantiate(PlayerHUDPrefab, _staticCanvas.transform).GetComponent<CharacterHUDScript>();
+                _playerHUD.Initialize(this, _currentPlayerCharacter);
+            }
+        }
+
+        private void HideBattleHUD()
         {
 
         }
 
-        private void HideHUD()
+        private void ShowBattleBackground(GameLevel gameLevel)
         {
-
-        }
-
-        private void SpawnBattleBackground()
-        {
-
+            if (_battleBackground != null)
+            {
+                _battleBackground.gameObject.SetActive(true);
+            }
+            else
+            {
+                _battleBackground = Instantiate(BattleBackgroundPrefab).GetComponent<BattleBackgroundScript>();
+                _battleBackground.Initialize(this);
+                _battleBackground.SetBackground(gameLevel);
+            }
         }
 
         private void HideBattleBackground()
         {
+            if (_battleBackground == null)
+            {
+                return;
+            }
 
+            _battleBackground.gameObject.SetActive(false);
         }
 
         private void HideMainMenu()
         {
+            if(_mainMenu == null)
+            {
+                return;
+            }
 
+            _mainMenu.gameObject.SetActive(false);
         }
 
         private void ShowLoadingScreen()
@@ -388,11 +483,32 @@ namespace Realmrover
 
         }
 
-        private void ShowMap()
+        private void ShowMainMap()
+        {
+            if (_mainMap != null)
+            {
+                _mainMap.gameObject.SetActive(true);
+            }
+            else
+            {
+                _mainMap = Instantiate(MainMapPrefab, _staticCanvas.transform).GetComponent<MainMapScript>();
+                _mainMap.Initialize(this);
+            }
+        }
+        private void HideMainMap()
+        {
+            if (_mainMap == null)
+            {
+                return;
+            }
+
+            _mainMap.gameObject.SetActive(false);
+        }
+
+        private void HideAll()
         {
 
         }
-
     }
 
 

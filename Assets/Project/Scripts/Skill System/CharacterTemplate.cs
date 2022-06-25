@@ -17,6 +17,7 @@ namespace Realmrover
         public int EnergyRegen = 0;
         public int EnergyRegenPerLevel = 0;
 
+        public Sprite PortraitImage;
         public RuntimeAnimatorController AnimationData;
         public List<Skill> Skills;
 

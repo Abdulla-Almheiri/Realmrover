@@ -194,7 +194,7 @@ namespace Realmrover
 
             SpawnSkillVFX(skill, _gameManager);
 
-            
+            _gameManager.StatsChanged();
             return true;
         }
 
@@ -855,6 +855,31 @@ namespace Realmrover
         public int AbsorbAmount()
         {
             return _absorb;
+        }
+
+        public int MaxHealth()
+        {
+            return _maxHealth;
+        }
+
+        public int CurrentHealth()
+        {
+            return _currentHealth;
+        }
+
+        public int MaxEnergy()
+        {
+            return _maxEnergy;
+        }
+
+        public int CurrentEnergy()
+        {
+            return _energy;
+        }
+
+        public CharacterTemplate Template()
+        {
+            return _template;
         }
     }
 
