@@ -397,10 +397,6 @@ MonoBehaviour:
   PlayerSpawnPoint: {fileID: 634853985}
   DynamicCanvasPrefab: {fileID: 2197727189711256815, guid: 018f63fca0b904a43b9bb9476b4eca9e, type: 3}
   StaticCanvasPrefab: {fileID: 431330384069247468, guid: be74a560e81fa0c408082e4193350225, type: 3}
-  seraphim_anim: {fileID: 22100000, guid: ee7217c9e6014c6489d9a676cfbc60b5, type: 2}
-  seraphim_sprite: {fileID: 1618593370, guid: 0242d8ee2f2d53747aebe152e0990a7c, type: 3}
-  titanoboa_anim: {fileID: 22100000, guid: 4eae13bf86fd2b44583a7d685133785e, type: 2}
-  titanoboa_sprite: {fileID: 1775740993, guid: 9f10bd82e1e47d14599c44d984375479, type: 3}
   EnemyPrefab: {fileID: 1289010375048162272, guid: 2806d50adbcf7c247a505a990ee923cc, type: 3}
   StartingEnemyTemplate: {fileID: 11400000, guid: 73414b0208af8b04ea9ec9b85c2bf285, type: 2}
   PlayerHUDPrefab: {fileID: 8532402038284902414, guid: 5acee62552e8edd4187da9c70733807a, type: 3}

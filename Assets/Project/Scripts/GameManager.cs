@@ -50,10 +50,10 @@ namespace Realmrover
         private Canvas _staticCanvas;
 
 
-        public AnimatorOverrideController seraphim_anim;
+       /* public AnimatorOverrideController seraphim_anim;
         public Sprite seraphim_sprite;
         public AnimatorOverrideController titanoboa_anim;
-        public Sprite titanoboa_sprite;
+        public Sprite titanoboa_sprite;*/
 
 
 
@@ -104,19 +104,6 @@ namespace Realmrover
 
             }
 
-            //test
-            if (Input.GetKeyDown(KeyCode.X))
-            {
-                _currentEnemyCharacter.gameObject.GetComponent<Animator>().runtimeAnimatorController = seraphim_anim;
-                //Enemy.GetComponent<SpriteRenderer>().sprite = seraphim_sprite;
-
-                
-            }
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                _currentEnemyCharacter.gameObject.GetComponent<Animator>().runtimeAnimatorController = titanoboa_anim;
-                //Enemy.GetComponent<SpriteRenderer>().sprite = titanoboa_sprite;
-            }
 
             HandleAbilityRecharge();
             UpdateSkillBarRecharge();
@@ -314,7 +301,11 @@ namespace Realmrover
 
         public void EndTurn(Character endedByCharacter)
         {
-            if (endedByCharacter.IsPlayer == true)
+            if (_currentEnemyCharacter.IsAlive() == false)
+            {
+                CurrentEnemyDefeated();
+            }
+                if (endedByCharacter.IsPlayer == true)
             {
                 _playerTurn = false;
                 _currentEnemyCharacter.EndTurn();
@@ -438,6 +429,7 @@ namespace Realmrover
             }
             else
             {
+                //ClearCurrentEnemy();
                 _playerTurn = true;
                 _currentEnemyInLevelIndex++;
                 Debug.Log("NEXT ENEMY!!");
@@ -471,7 +463,7 @@ namespace Realmrover
 
         private void ClearCurrentEnemy()
         {
-            Destroy(EnemyPrefab);
+            _currentEnemyCharacter = null;
         }
         public void SwitchPlayerClass(CharacterTemplate template)
         {
@@ -514,8 +506,10 @@ namespace Realmrover
 
         private void EnterMainMap()
         {
+            ChangeGameState(GameState.MAIN_MAP);
             HideMainMenu();
             ShowMainMap();
+
         }
 
         public void StartLevel(int index)
@@ -531,6 +525,7 @@ namespace Realmrover
         }
         private void EnterBattle(GameLevel gameLevel)
         {
+            ChangeGameState(GameState.BATTLE);
             HideAll();
             ShowBattleScreen();
 
@@ -544,6 +539,7 @@ namespace Realmrover
 
 
             HideLoadingScreen();
+
         }
 
         public void CurrentEnemyDefeated()
@@ -553,9 +549,10 @@ namespace Realmrover
                 return;
             } else
             {
+                ShowMainMap();
                 _currentEnemy = null;
                 _currentEnemyCharacter = null;
-                ShowMainMap();
+
             }
         }
         private void LeaveBattle()

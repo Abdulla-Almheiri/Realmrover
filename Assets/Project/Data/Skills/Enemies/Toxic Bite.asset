@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29d0d1a242dcfef48aa731feb6cbd188, type: 3}
-  m_Name: Slam
+  m_Name: Toxic Bite
   m_EditorClassIdentifier: 
   Icon: {fileID: 0}
-  Name: Slam
-  Description: Deals 15 damage and reduces damage done by 20% for 2 turns.
+  Name: Toxic Bite
+  Description: Deals 5 damage and poisons the target dealing 20 damage over 10 turns.
   Level: 1
-  EnergyCost: 5
+  EnergyCost: 3
   EnergyGain: 0
-  BaseDamage: 15
+  BaseDamage: 5
   SacrificeDamage: 0
   SacrificeDamageLethal: 0
   Heal: 0
@@ -38,17 +38,17 @@ MonoBehaviour:
   ReduceDamageTakenTurns: 0
   ReduceEnergyCostForTurns: 0
   ReduceEnergyCostTurns: 0
-  DamagePerTurn: 0
-  DamageTurns: 0
+  DamagePerTurn: 2
+  DamageTurns: 10
   DamageOverTimeStacks: 0
   DamageOverTimeRefreshesDuration: 1
-  ReduceDamageDone: 20
-  ReduceDamageDoneTurns: 2
+  ReduceDamageDone: 0
+  ReduceDamageDoneTurns: 0
   IncreaseDamageTakenForTurns: 0
   IncreaseDamageTakenTurns: 0
   EnhanceNextDamage: 0
   EnhanceNextEnergyCost: 0
   EnhanceNextSkill: {fileID: 0}
-  EnemySkillPrefab: {fileID: 9011296371463313218, guid: 70bea9060f47b6448bb91dea794d7a0c, type: 3}
+  EnemySkillPrefab: {fileID: 8299941733052616721, guid: a2b8925ff3394c34198c6a8bbf1caf8b, type: 3}
   SelfSkillPrefab: {fileID: 0}
   AnimationType: 1

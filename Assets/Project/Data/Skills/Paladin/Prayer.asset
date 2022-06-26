@@ -47,9 +47,9 @@ MonoBehaviour:
   ReduceDamageDoneTurns: 0
   IncreaseDamageTakenForTurns: 0
   IncreaseDamageTakenTurns: 0
-  EnhanceNextDamage: 100
-  EnhanceNextEnergyCost: 50
-  EnhanceNextSkill: {fileID: 11400000, guid: ab9663710eee0a0408334fdc3c450f87, type: 2}
+  EnhanceNextDamage: 0
+  EnhanceNextEnergyCost: 0
+  EnhanceNextSkill: {fileID: 0}
   EnemySkillPrefab: {fileID: 0}
-  SelfSkillPrefab: {fileID: 0}
+  SelfSkillPrefab: {fileID: 2349384871079090958, guid: e35c76f326ac8354b9567084e55d14d4, type: 3}
   AnimationType: 1

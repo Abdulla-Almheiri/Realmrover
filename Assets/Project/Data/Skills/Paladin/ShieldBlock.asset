@@ -50,5 +50,5 @@ MonoBehaviour:
   EnhanceNextEnergyCost: 0
   EnhanceNextSkill: {fileID: 0}
   EnemySkillPrefab: {fileID: 0}
-  SelfSkillPrefab: {fileID: 971680748741051436, guid: e309437427be4dc49b1cba3bcea47385, type: 3}
+  SelfSkillPrefab: {fileID: 7540108035479543248, guid: 46d18b1683e119d43bd3df3ecea97e32, type: 3}
   AnimationType: 1
