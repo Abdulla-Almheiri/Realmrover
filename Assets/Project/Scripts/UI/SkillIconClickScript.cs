@@ -19,5 +19,6 @@ namespace Realmrover
 
             _skillBar.AbilityClicked(_index);
         }
+
     }
 }

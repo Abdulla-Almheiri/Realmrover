@@ -394,6 +394,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: ShieldBlockSkillEffect_11
+      rect:
+        serializedVersion: 2
+        x: 704
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70402f60440bb794c9b417b31ab184d4
+      internalID: -776943134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -411,6 +432,7 @@ TextureImporter:
       ShieldBlockSkillEffect_1: 451526917
       ShieldBlockSkillEffect_2: -1241255401
       ShieldBlockSkillEffect_4: -1448593441
+      ShieldBlockSkillEffect_11: -776943134
       ShieldBlockSkillEffect_9: -1097912739
       ShieldBlockSkillEffect_7: 331670763
       ShieldBlockSkillEffect_0: 1718771537

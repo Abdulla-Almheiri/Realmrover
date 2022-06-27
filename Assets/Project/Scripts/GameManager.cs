@@ -458,7 +458,7 @@ namespace Realmrover
         }
         public void BattleControlButtonPressed()
         {
-
+            EndTurnButtonPress();
         }
 
         private void ClearCurrentEnemy()
