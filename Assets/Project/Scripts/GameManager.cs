@@ -557,11 +557,12 @@ namespace Realmrover
         }
         private void LeaveBattle()
         {
-            HideBattleBackground();
+            HideAll();
+            /*HideBattleBackground();
             HideBattleHUD();
             HideCharacter(_currentPlayerCharacter);
             HideCharacter(_currentEnemyCharacter);
-            HideBattleControlButton();
+            HideBattleControlButton();*/
             EnterMainMap();
         }
 
@@ -606,7 +607,9 @@ namespace Realmrover
         {
             if (_battleBackground != null)
             {
+                
                 _battleBackground.gameObject.SetActive(true);
+                _battleBackground.SetBackground(_currentGameLevel);
             }
             else
             {

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: HoC Controller
+  m_Controller: {fileID: 9100000, guid: 35ed06cce16080b44b68340a73df5809, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 47ad0432e86c94b439a9081536700830, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 0337391e5abc240438c8cac0a0f7d108, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: a11238de845233d47af5ce90cc900db1, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: fb45300660394e940b268384d75c00bb, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 26ca6514f3580344490d083bd40eda07, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 1b451fe39d306584c86a4f2711edf728, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: d025ae166f87d394bb64b9b1d9fa2ef7, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: e4f832cecf613ca43b5bfc4422604e10, type: 2}

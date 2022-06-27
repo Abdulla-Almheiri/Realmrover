@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 495ab9ee4906a9940a9a0f241d2c1b52, type: 3}
+  m_Name: Heart of Corruption
+  m_EditorClassIdentifier: 
+  Level: 1
+  Health: 200
+  HealthRegen: 10
+  HealthRegenPerLevel: 4
+  MaxHealthPerLevel: 40
+  Energy: 40
+  MaxEnergyPerLevel: 10
+  EnergyRegen: 10
+  EnergyRegenPerLevel: 2
+  PortraitImage: {fileID: 0}
+  AnimationData: {fileID: 22100000, guid: b80259c11d3163e4185f680252ce66c3, type: 2}
+  Skills:
+  - {fileID: 11400000, guid: b3c29abfa9be0c646b5c128f46a4bf6f, type: 2}
+  - {fileID: 11400000, guid: 350c36c75d8c4dc4a97937836c45b1f3, type: 2}
