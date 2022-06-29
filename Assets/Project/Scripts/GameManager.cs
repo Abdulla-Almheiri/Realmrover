@@ -95,16 +95,6 @@ namespace Realmrover
         }
         private void Update()
         {
-            if(Input.GetKeyDown(KeyCode.F))
-            {
-                if(IsRecharging() == false)
-                {
-                    EndTurnButtonPress();
-                }
-
-            }
-
-
             HandleAbilityRecharge();
             UpdateSkillBarRecharge();
             HandlePlayerInput();
@@ -119,7 +109,7 @@ namespace Realmrover
             InitializeCanvases();
             //InitializeBattleHUD();
 
-            StartGame();
+            EnterGame();
         }
 
         private void UpdateSkillBarRecharge()
@@ -171,7 +161,7 @@ namespace Realmrover
                 return;
             }
 
-            if (_gameState == GameState.BATTLE)
+            if (_gameState == GameState.BATTLE_START)
             {
                 HideAll();
                 ShowBattleScreen();
@@ -285,7 +275,7 @@ namespace Realmrover
 
         private void PlayerDefeated()
         {
-            ShowMainMenu();
+            UpdateBattleControlButton(BattleButtonStates.LEAVE);
         }
         public void SpawnDamageNumber(int value, FloatingTextType textType, bool AtEnemy = true)
         {
@@ -439,9 +429,20 @@ namespace Realmrover
             }
         }
 
+        private void NextBattle()
+        {
+            if(_currentEnemyInLevelIndex >= _currentGameLevel.Enemies.Count)
+            {
+                UpdateBattleControlButton(BattleButtonStates.LEAVE);
+            } else
+            {
+                SpawnNextEnemy();
+            }
+        }
         public void EndLevel()
         {
-            LeaveBattle();
+            UpdateBattleControlButton(BattleButtonStates.LEAVE);
+            //LeaveBattle();
         }
 
         private void ShowBattleControlButton()
@@ -456,9 +457,23 @@ namespace Realmrover
                 _battleControlButton.Initialize(this);
             }
         }
-        public void BattleControlButtonPressed()
+        public void BattleControlButtonPressed(BattleButtonStates buttonState)
         {
-            EndTurnButtonPress();
+            switch (buttonState)
+            {
+                case BattleButtonStates.END_TURN:
+                    EndTurnButtonPress();
+                    break;
+                case BattleButtonStates.NEXT_BATTLE:
+                    NextBattle();
+                    break;
+                case BattleButtonStates.LEAVE:
+                    LeaveBattle();
+                    break;
+                default:
+                    break;
+            }
+            
         }
 
         private void ClearCurrentEnemy()
@@ -480,13 +495,13 @@ namespace Realmrover
             return _currentEnemyCharacter;
         }
 
-        public void StartGame()
+        public void EnterGame()
         {
             HideAll();
             ShowMainMenu();
         }
 
-        public void StartGameSession()
+        public void EnterGameSession()
         {
             HideAll();
             ShowMainMap();
@@ -525,7 +540,7 @@ namespace Realmrover
         }
         private void EnterBattle(GameLevel gameLevel)
         {
-            ChangeGameState(GameState.BATTLE);
+            ChangeGameState(GameState.BATTLE_START);
             HideAll();
             ShowBattleScreen();
 
@@ -742,8 +757,13 @@ namespace Realmrover
     public enum GameState
     {
         MAIN_MENU,
+        MAIN_MENU_SETTINGS,
         MAIN_MAP,
-        BATTLE,
+        BATTLE_START,
+        BATTLE_PLAYER_TURN,
+        BATTLE_ENEMY_TURN,
+        BATTLE_PLAYER_DEFEAT,
+        BATTLE_PLAYER_WIN,
         END_SCREEN
 
 

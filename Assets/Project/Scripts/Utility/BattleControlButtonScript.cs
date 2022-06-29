@@ -35,7 +35,7 @@ namespace Realmrover
 
         public void ButtonPressed()
         {
-            _gameManager.BattleControlButtonPressed();
+            _gameManager.BattleControlButtonPressed(_buttonState);
         }
     }
 
