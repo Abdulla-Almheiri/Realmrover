@@ -13,6 +13,7 @@ namespace Realmrover
         [Header("Character Prefab")]
         public GameObject CharacterPrefab;
 
+
         [Space(20)]
         [Header("Player Information")]
         public GameObject PlayerPrefab;
@@ -21,20 +22,40 @@ namespace Realmrover
         public CharacterTemplate PlayerTemplate;
 
         [Space(20)]
+        [Header("Enemy Defaults")]
+        [SerializeField]
+        private CharacterTemplate _defaultEnemyTemplate;
+
+        [Space(20)]
+        [Header("Background Image")]
+        [SerializeField]
+        private SpriteRenderer _backgroundImage;
+        [SerializeField]
+        private Sprite _defaultBackgroundImage;
+
+        [Space(20)]
         [Header("Main Menu")]
-        public GameObject MainMenuPrefab;
-        private MainMenuScript _mainMenu;
+        public GameObject MainMenuScreenPrefab;
+        private MainMenuScript _mainMenuScreen;
 
         [Space(20)]
         [Header("Main Map")]
-        public GameObject MainMapPrefab;
-        private MainMapScript _mainMap;
+        public GameObject MainMapScreenPrefab;
+        private GameObject _mainMapObject;
+        private MainMapScript _mainMapScreen;
+
+        [Space(20)]
+        [Header("Battle Screen")]
+        public GameObject BattleScreenPrefab;
+        private BattleScreenScript _battleScreen;
 
         [Space(20)]
         [Header("Levels")]
-        public List<GameLevel> Levels = new List<GameLevel>();
-        private int _currentEnemyInLevelIndex = -1;
+        [SerializeField]
+        private List<GameLevel> _gameLevels = new List<GameLevel>();
+        private int _currentEnemyInLevelIndex = 0;
         private GameLevel _currentGameLevel;
+        private int _currentGameLevelIndex = 0;
 
         [Space(20)]
         [Header("Spawn Locations")]
@@ -50,31 +71,10 @@ namespace Realmrover
         private Canvas _staticCanvas;
 
 
-       /* public AnimatorOverrideController seraphim_anim;
-        public Sprite seraphim_sprite;
-        public AnimatorOverrideController titanoboa_anim;
-        public Sprite titanoboa_sprite;*/
-
-
-
         public GameObject EnemyPrefab;
         private GameObject _currentEnemy;
         private Character _currentEnemyCharacter;
         public CharacterTemplate StartingEnemyTemplate;
-
-        [Space(20)]
-        [Header("Battle HUD")]
-        public GameObject PlayerHUDPrefab;
-        private CharacterHUDScript _playerHUD;
-
-        public GameObject SkillBarPrefab;
-        private SkillBarUIScript _skillBar;
-
-        public GameObject BattleBackgroundPrefab;
-        private BattleBackgroundScript _battleBackground;
-
-        public GameObject BattleControlButtonPrefab;
-        private BattleControlButtonScript _battleControlButton;
 
         [Space(20)]
         [Header("Floating Combat Text")]
@@ -83,11 +83,12 @@ namespace Realmrover
 
         private bool _playerTurn = true;
         private float _maxAbilityRechargeTime = 1f;
-        private float _abilityRechargeTime = 1f;
+        private float _abilityRechargeTime = 0.5f;
         private float _turnDelayTime = 1f;
         private GameState _gameState = GameState.MAIN_MENU;
         private bool _gameStateDirty = true;
-        
+
+
 
         private void Awake()
         {
@@ -96,30 +97,113 @@ namespace Realmrover
         private void Update()
         {
             HandleAbilityRecharge();
-            UpdateSkillBarRecharge();
-            HandlePlayerInput();
-            //UpdateUI();
+            HandleGame();
         }
 
-        
+        //To be called first in Awake()
         private void Initialize()
         {
-            //SpawnCharacter(PlayerTemplate, true);
-            //SpawnCharacter(StartingEnemyTemplate);
             InitializeCanvases();
-            //InitializeBattleHUD();
+            InitializeMainMenuScreen();
+            InitializeMainMapScreen();
+            InitializeBattleScreen();
+            InitializePlayer();
+            InitializeEnemy();
+            //EnterGame();
+        }
 
+        private void Start()
+        {
             EnterGame();
         }
 
-        private void UpdateSkillBarRecharge()
+        //To be called every frame in Update()
+        private void HandleGame()
         {
-            if (_skillBar == null || _skillBar.gameObject.activeSelf == false)
+            HandleCombat();
+        }
+
+        private void HandleCombat()
+        {
+            switch (_gameState)
             {
+                case GameState.MAIN_MENU:
+                    break;
+                case GameState.MAIN_MENU_SETTINGS:
+                    break;
+                case GameState.MAIN_MAP:
+                    break;
+                case GameState.BATTLE_START:
+                    HandlePlayerInput();
+                    break;
+                case GameState.BATTLE_PLAYER_TURN:
+                    HandlePlayerInput();
+                    break;
+                case GameState.BATTLE_ENEMY_TURN:
+                    HandleEnemyAI();
+                    break;
+                case GameState.BATTLE_PLAYER_DEFEAT:
+                    break;
+                case GameState.BATTLE_PLAYER_WIN:
+                    if(SpawnNextEnemy())
+                    {
+                        ChangeGameState(GameState.BATTLE_PLAYER_TURN, _turnDelayTime);
+
+                    } else
+                    {
+                        ChangeGameState(GameState.END_OF_LEVEL, _turnDelayTime);
+                    }
+                    break;
+                case GameState.END_SCREEN:
+                    break;
+                case GameState.TRANSITION:
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void HandleEnemyAI()
+        {
+            _currentEnemyCharacter.MakeNextMove(_currentPlayerCharacter);
+            EndTurn(_currentEnemyCharacter);
+        }
+        private void InitializeMainMenuScreen()
+        {
+            if (_mainMenuScreen != null)
+            {
+                Debug.LogWarning("Main Menu Screen is already initialized.");
                 return;
             }
 
-            _skillBar.UpdateRechargeAllSkills(_abilityRechargeTime/_maxAbilityRechargeTime);
+            var spawn = Instantiate(MainMenuScreenPrefab, _staticCanvas.transform);
+            _mainMenuScreen = spawn.GetComponent<MainMenuScript>();
+            _mainMenuScreen.Initialize(this);
+        }
+        private void InitializeMainMapScreen()
+        {
+            if (_mainMapScreen != null)
+            {
+                Debug.LogWarning("Main Map Screen is already initialized.");
+                return;
+            }
+
+            var spawn = Instantiate(MainMapScreenPrefab, _staticCanvas.transform);
+            _mainMapObject = spawn;
+            _mainMapScreen = spawn.GetComponent<MainMapScript>();
+            _mainMapScreen.Initialize(this);
+        }
+        private void InitializeBattleScreen()
+        {
+            if (_battleScreen != null)
+            {
+                Debug.LogWarning("Battle Screen is already initialized.");
+                return;
+            }
+
+            var spawn = Instantiate(BattleScreenPrefab, _staticCanvas.transform);
+            _battleScreen = spawn.GetComponent<BattleScreenScript>();
+            _battleScreen.Initialize(this);
         }
         private void InitializeCanvases()
         {
@@ -128,158 +212,82 @@ namespace Realmrover
             _staticCanvas = Instantiate(StaticCanvasPrefab);
             _staticCanvas.worldCamera = Camera.main;
         }
-        private void InitializeBattleHUD()
+
+        private void InitializePlayer(int level = 1)
         {
-            _playerHUD = Instantiate(PlayerHUDPrefab, _staticCanvas.transform).GetComponent<CharacterHUDScript>();
-            _playerHUD.Initialize(this, _currentPlayerCharacter);
+            InitializeCharacter(true, level);
         }
 
-        private void ChangeGameState(GameState newGameState)
+        private void InitializeCharacter(bool IsPlayer = false, int playerLevel = 1)
         {
-            _gameState = newGameState;
-            _gameStateDirty = true;
-        }
-
-        private void UpdateGameState()
-        {
-            if(_gameStateDirty == false)
+            if (IsPlayer == true)
             {
-                return;
-            }
+                if (_currentPlayer != null)
+                {
+                    Debug.LogWarning("Player object is already initialized!");
+                    return;
+                }
 
-            if(_gameState == GameState.MAIN_MENU)
-            {
-                HideAll();
-                ShowMainMenu();
-                return;
-            }
+                _currentPlayer = Instantiate(CharacterPrefab, PlayerSpawnPoint);
+                _currentPlayerCharacter = _currentPlayer.GetComponent<Character>();
+                _currentPlayerCharacter.Initialize(this);
+                _currentPlayerCharacter.SetCharacterTemplate(PlayerTemplate);
 
-            if (_gameState == GameState.MAIN_MAP)
-            {
-                HideAll();
-                ShowMainMap();
-                return;
-            }
-
-            if (_gameState == GameState.BATTLE_START)
-            {
-                HideAll();
-                ShowBattleScreen();
-                return;
-            }
-        }
-
-        private void HandleMainMenu()
-        {
-            UpdateGameState(GameState.MAIN_MENU);
-
-        }
-
-        private void HandleMainMap()
-        {
-
-        }
-
-        private void HandleBattleScreen()
-        {
-
-        }
-
-        private void HandleGameStates()
-        {
-
-        }
-        public void UpdateGameState(GameState newGameState)
-        {
-            _gameState = newGameState;
-            _gameStateDirty = true;
-        }
-
-        private void LoadLevel(GameLevel gameLevel)
-        {
-            _currentGameLevel = gameLevel;
-        }
-        public void UpdatePlayerHUD()
-        {
-            _playerHUD.UpdateStats();
-        }
-
-        public void UpdateBattleControlButton(BattleButtonStates buttonState)
-        {
-            _battleControlButton.UpdateUI(buttonState);
-        }
-        public void StatsChanged()
-        {
-            UpdatePlayerHUD();
-        }
-        public void SpawnPlayer(int level=1)
-        {
-            if (_currentPlayer != null)
-            {
-                _currentPlayer.SetActive(true);
-            }
-            else
-            {
-
-                var spawn = Instantiate(CharacterPrefab, PlayerSpawnPoint);
-                _currentPlayer = spawn;
-                _currentPlayerCharacter = spawn.GetComponent<Character>();
-                _currentPlayerCharacter.Initialize(PlayerTemplate, this, level, true);
-            }
-        }
-
-        private void SpawnEnemy(CharacterTemplate template, int level = 1)
-        {
-            if (_currentEnemy != null)
-            {
-                _currentEnemy.SetActive(true);
-            }
-            else
-            {
-
-                var spawn = Instantiate(CharacterPrefab, EnemySpawnPoint);
-                _currentEnemy = spawn;
-                _currentEnemyCharacter = spawn.GetComponent<Character>();
-                _currentEnemyCharacter.Initialize(template, this, level, false);
-            }
-        }
-
-
-        public void SpawnCharacter(CharacterTemplate template, bool IsPLayer = false, int level = 1)
-        {
-            if(template == null)
-            {
-                return;
-            }
-
-            if(IsPLayer == true)
-            {
-                SpawnPlayer();
+                if (_currentPlayerCharacter == null)
+                {
+                    Debug.LogWarning("Initialize Character Error: Player Character component missing from CharacterPrefab!");
+                }
             } else
             {
-                SpawnEnemy(template);
+                if (_currentEnemy != null)
+                {
+                    Debug.LogWarning("Enemy object is already initialized!");
+                    return;
+                }
+
+                _currentEnemy = Instantiate(CharacterPrefab, EnemySpawnPoint);
+                _currentEnemyCharacter = _currentEnemy.GetComponent<Character>();
+                _currentEnemyCharacter.Initialize(this);
+                if (_currentEnemyCharacter == null)
+                {
+                    Debug.LogWarning("Initialize Character Error: Enemy Character component missing from CharacterPrefab!");
+                }
+
+            }
+        }
+        private void InitializeEnemy()
+        {
+            InitializeCharacter();
+        }
+        private void TogglePlayerCharacter(bool value)
+        {
+            ToggleObject(_currentPlayer, value);
+        }
+
+        private void ToggleEnemyCharacter(bool value)
+        {
+            ToggleObject(_currentEnemy, value);
+        }
+
+        private void ToggleObject(GameObject obj, bool value)
+        {
+            if (obj == null)
+            {
+                Debug.LogWarning("Toggling Object: Object is null!");
+                return;
+            }
+            if (obj.gameObject.activeSelf == value)
+            {
+                Debug.LogWarning("Toggling Object: Object is already " + (value? "on!": "off!"));
+                return;
             }
 
+            obj.SetActive(value);
         }
 
-        public void CharacterDead(Character character)
-        {
-            if(character == _currentEnemyCharacter)
-            {
-                CurrentEnemyDefeated();
-            } else if(character == _currentPlayer)
-            {
-                PlayerDefeated();
-            }
-        }
-
-        private void PlayerDefeated()
-        {
-            UpdateBattleControlButton(BattleButtonStates.LEAVE);
-        }
         public void SpawnDamageNumber(int value, FloatingTextType textType, bool AtEnemy = true)
         {
-            if(EnemyPrefab == null || PlayerPrefab == null || _currentEnemyCharacter == null || _currentPlayerCharacter == null)
+            if (EnemyPrefab == null || PlayerPrefab == null || _currentEnemyCharacter == null || _currentPlayerCharacter == null)
             {
                 return;
             }
@@ -291,33 +299,54 @@ namespace Realmrover
 
         public void EndTurn(Character endedByCharacter)
         {
-            if (_currentEnemyCharacter.IsAlive() == false)
-            {
-                CurrentEnemyDefeated();
-            }
-                if (endedByCharacter.IsPlayer == true)
-            {
-                _playerTurn = false;
-                _currentEnemyCharacter.EndTurn();
-                _currentEnemyCharacter.MakeNextMove(_currentPlayerCharacter, this);
-
-
-            } else
+            if(endedByCharacter == _currentPlayerCharacter)
             {
                 _currentPlayerCharacter.EndTurn();
-                _playerTurn = true;
+                ChangeGameState(GameState.BATTLE_ENEMY_TURN, _turnDelayTime);
+            } else if(endedByCharacter == _currentEnemyCharacter)
+            {
+                _currentEnemyCharacter.EndTurn();
+                ChangeGameState(GameState.BATTLE_PLAYER_TURN, _turnDelayTime);
             }
 
-            StatsChanged();
+            UpdateResourcesUI();
         }
 
+        public void UpdateResourcesUI()
+        {
+            _battleScreen.UpdatePlayerResources(_currentPlayerCharacter);
+            _battleScreen.UpdateEnemyResources(_currentEnemyCharacter);
+
+        }
         public void EndTurnButtonPress()
         {
-            EndTurn(_currentPlayerCharacter);
+            if (_gameState == GameState.TRANSITION)
+            {
+                return;
+            }
+
+            if (_gameState == GameState.BATTLE_PLAYER_TURN)
+            {
+                EndTurn(_currentPlayerCharacter);
+            } else if(_gameState == GameState.END_OF_LEVEL)
+            {
+                ToggleAll(false);
+                ToggleMainMapScreen(true);
+                _currentPlayerCharacter.EndBattle();
+                _currentEnemyCharacter.EndBattle();
+            } else if(_gameState == GameState.BATTLE_PLAYER_DEFEAT)
+            {
+                ToggleAll(false);
+                ToggleMainMapScreen(true);
+                _currentPlayerCharacter.EndBattle();
+                _currentEnemyCharacter.EndBattle();
+            }
+
+
         }
         public void ActivateAbility(int index)
         {
-            if (_playerTurn != true)
+            if (_gameState != GameState.BATTLE_PLAYER_TURN)
             {
                 return;
             }
@@ -334,12 +363,12 @@ namespace Realmrover
         }
         private void HandlePlayerInput()
         {
-            if (_playerTurn != true)
+            if (_gameState != GameState.BATTLE_PLAYER_TURN )
             {
                 return;
             }
 
-            if(IsRecharging())
+            if (IsRecharging())
             {
                 return;
             }
@@ -403,72 +432,32 @@ namespace Realmrover
             return _abilityRechargeTime >= 0.1f;
         }
 
-        public void ApplyDelay(float duration)
+        private void ChangeGameState(GameState newState, float delay = 0f)
         {
-
+            if(delay == 0f)
+            {
+                _gameState = newState;
+                return;
+            }
+            StartCoroutine(SwitchStateDelayCO( newState, delay));
         }
 
-        public bool SpawnNextEnemy()
+        private IEnumerator SwitchStateDelayCO(GameState newState, float delay)
         {
-            
-            if (_currentEnemyInLevelIndex >= _currentGameLevel.Enemies.Count-1)
-            {
-                //Handle Next Level here
-                EndLevel();
-                return false;
-            }
-            else
-            {
-                //ClearCurrentEnemy();
-                _playerTurn = true;
-                _currentEnemyInLevelIndex++;
-                Debug.Log("NEXT ENEMY!!");
-                HideCharacter(_currentEnemyCharacter);
-                SpawnCharacter(_currentGameLevel.Enemies[_currentEnemyInLevelIndex].Template, false, _currentGameLevel.Enemies[_currentEnemyInLevelIndex].Level);
-                return true;
-            }
-        }
-
-        private void NextBattle()
-        {
-            if(_currentEnemyInLevelIndex >= _currentGameLevel.Enemies.Count)
-            {
-                UpdateBattleControlButton(BattleButtonStates.LEAVE);
-            } else
-            {
-                SpawnNextEnemy();
-            }
-        }
-        public void EndLevel()
-        {
-            UpdateBattleControlButton(BattleButtonStates.LEAVE);
-            //LeaveBattle();
-        }
-
-        private void ShowBattleControlButton()
-        {
-            if (_battleControlButton != null)
-            {
-                _battleControlButton.gameObject.SetActive(true);
-            }
-            else
-            {
-                _battleControlButton = Instantiate(BattleControlButtonPrefab, _staticCanvas.transform).GetComponent<BattleControlButtonScript>();
-                _battleControlButton.Initialize(this);
-            }
+            _gameState = GameState.TRANSITION;
+            yield return new WaitForSeconds(delay);
+            _gameState = newState;
         }
         public void BattleControlButtonPressed(BattleButtonStates buttonState)
         {
             switch (buttonState)
             {
                 case BattleButtonStates.END_TURN:
-                    EndTurnButtonPress();
+                    //EndTurnButtonPress();
                     break;
                 case BattleButtonStates.NEXT_BATTLE:
-                    NextBattle();
                     break;
                 case BattleButtonStates.LEAVE:
-                    LeaveBattle();
                     break;
                 default:
                     break;
@@ -476,10 +465,6 @@ namespace Realmrover
             
         }
 
-        private void ClearCurrentEnemy()
-        {
-            _currentEnemyCharacter = null;
-        }
         public void SwitchPlayerClass(CharacterTemplate template)
         {
             PlayerTemplate = template;
@@ -497,247 +482,127 @@ namespace Realmrover
 
         public void EnterGame()
         {
-            HideAll();
-            ShowMainMenu();
+            ToggleAll(false);
+            ToggleMainMenuScreen(true);
         }
 
-        public void EnterGameSession()
+        public void NewGameButtonPressed()
         {
-            HideAll();
-            ShowMainMap();
+            ToggleAll(false);
+            _battleScreen.UpdatePlayerSkillBar(_currentPlayerCharacter);
+            ToggleMainMapScreen(true);
         }
 
-        private void ShowMainMenu()
+        public void LevelSelected(int index)
         {
-            if(_mainMenu != null)
+            if(_gameLevels == null || _gameLevels.Count == 0)
             {
-                _mainMenu.gameObject.SetActive(true);
-            } else
-            {
-                _mainMenu = Instantiate(MainMenuPrefab, _staticCanvas.transform).GetComponent<MainMenuScript>();
-                _mainMenu.Initialize(this);
-            }
-        }
-
-        private void EnterMainMap()
-        {
-            ChangeGameState(GameState.MAIN_MAP);
-            HideMainMenu();
-            ShowMainMap();
-
-        }
-
-        public void StartLevel(int index)
-        {
-            if(Levels == null || Levels.Count <= index)
-            {
-                return;
-            }
-            _currentGameLevel = Levels[index];
-            _currentEnemyInLevelIndex = -1;
-            EnterBattle(Levels[index]);
-
-        }
-        private void EnterBattle(GameLevel gameLevel)
-        {
-            ChangeGameState(GameState.BATTLE_START);
-            HideAll();
-            ShowBattleScreen();
-
-            /*ShowLoadingScreen();
-            HideMainMap();
-            ShowBattleBackground(gameLevel);
-            SpawnPlayer();
-            SpawnNextEnemy(gameLevel);
-            ShowBattleHUD();
-            ShowBattleControlButton();*/
-
-
-            HideLoadingScreen();
-
-        }
-
-        public void CurrentEnemyDefeated()
-        {
-           if(SpawnNextEnemy())
-            {
-                return;
-            } else
-            {
-                ShowMainMap();
-                _currentEnemy = null;
-                _currentEnemyCharacter = null;
-
-            }
-        }
-        private void LeaveBattle()
-        {
-            HideAll();
-            /*HideBattleBackground();
-            HideBattleHUD();
-            HideCharacter(_currentPlayerCharacter);
-            HideCharacter(_currentEnemyCharacter);
-            HideBattleControlButton();*/
-            EnterMainMap();
-        }
-
-        private void HideBattleControlButton()
-        {
-            if(_battleControlButton == null)
-            {
+                Debug.LogWarning("Game Levels: List is null or has zero elements!");
                 return;
             }
 
-            _battleControlButton.gameObject.SetActive(false);
+            if(index >= _gameLevels.Count || index <0)
+            {
+                Debug.LogWarning("Game Levels: Index is out of range!");
+                return;
+            }
+
+            _currentGameLevelIndex = index;
+            ToggleAll(false);
+            ToggleBattleScreen(true);
+            _battleScreen.UpdateBackground(_gameLevels[_currentGameLevelIndex].Background);
+            _battleScreen.SetButtonText(BattleControlButtonTextType.END_TURN);
+            TogglePlayerCharacter(true);
+            _currentEnemyInLevelIndex = 0;
+            var enemyTemplateToSpawn = _gameLevels[index].Enemies[_currentEnemyInLevelIndex].Template;
+            if(enemyTemplateToSpawn == null)
+            {
+                Debug.LogWarning("Level Selected: Enemy template in current level is null!");
+                return;
+            }
+
+            _currentEnemyCharacter.SetCharacterTemplate(enemyTemplateToSpawn);
+ 
+            ToggleEnemyCharacter(true);
+            UpdateResourcesUI();
+            _gameState = GameState.BATTLE_PLAYER_TURN;
         }
-        private void HideCharacter(Character character)
+
+        private void UpdateCurrentBattleBackground()
+        {
+
+        }
+
+        public bool SpawnNextEnemy()
+        {
+            var enemyList = _gameLevels[_currentGameLevelIndex].Enemies;
+            if (enemyList == null || _currentEnemyInLevelIndex >= enemyList.Count-1)
+            {
+                Debug.Log("Spawning Next Enemy: No more enemies to spawn.");
+                _battleScreen.SetButtonText(BattleControlButtonTextType.BACK_TO_MAIN_MAP);
+                return false;
+            }
+            
+            _currentEnemyInLevelIndex++;
+            _currentEnemyCharacter.EndBattle();
+            _currentEnemyCharacter.SetCharacterTemplate(enemyList[_currentEnemyInLevelIndex].Template, enemyList[_currentEnemyInLevelIndex].Level);
+            UpdateResourcesUI();
+            return true;
+        }
+
+        public void ReportCharacterDeath(Character character)
         {
             if(character == null)
             {
+                Debug.LogWarning("Report Character Death: Character is null!");
                 return;
             }
 
-            character.gameObject.SetActive(false);
-        }
-
-        private void ShowBattleHUD()
-        {
-            if (_playerHUD != null)
+            if(character == _currentPlayerCharacter)
             {
-                _playerHUD.gameObject.SetActive(true);
-            }
-            else
-            {
-                _playerHUD = Instantiate(PlayerHUDPrefab, _staticCanvas.transform).GetComponent<CharacterHUDScript>();
-                _playerHUD.Initialize(this, _currentPlayerCharacter);
-            }
-        }
-
-        private void HideBattleHUD()
-        {
-
-        }
-
-        private void ShowBattleBackground()
-        {
-            if (_battleBackground != null)
-            {
-                
-                _battleBackground.gameObject.SetActive(true);
-                _battleBackground.SetBackground(_currentGameLevel);
-            }
-            else
-            {
-                _battleBackground = Instantiate(BattleBackgroundPrefab).GetComponent<BattleBackgroundScript>();
-                _battleBackground.Initialize(this);
-                _battleBackground.SetBackground(_currentGameLevel);
-            }
-        }
-
-        private void HideBattleBackground()
-        {
-            if (_battleBackground == null)
-            {
-                return;
+                StopAllCoroutines();
+                ChangeGameState(GameState.BATTLE_PLAYER_DEFEAT);
+                _battleScreen.SetButtonText(BattleControlButtonTextType.BACK_TO_MAIN_MAP);
+                //player died
             }
 
-            _battleBackground.gameObject.SetActive(false);
-        }
-
-        private void HideMainMenu()
-        {
-            if(_mainMenu == null)
+            if(character == _currentEnemyCharacter)
             {
-                return;
-            }
-
-            _mainMenu.gameObject.SetActive(false);
-        }
-
-        private void ShowLoadingScreen()
-        {
-
-        }
-
-        private void HideLoadingScreen()
-        {
-
-        }
-
-        private void ShowMainMap()
-        {
-            if (_mainMap != null)
-            {
-                _mainMap.gameObject.SetActive(true);
-            }
-            else
-            {
-                _mainMap = Instantiate(MainMapPrefab, _staticCanvas.transform).GetComponent<MainMapScript>();
-                _mainMap.Initialize(this);
-            }
-        }
-        private void HideMainMap()
-        {
-            if (_mainMap == null)
-            {
-                return;
-            }
-
-            _mainMap.gameObject.SetActive(false);
-        }
-        private void ShowBattleScreen()
-        {
-            ShowLoadingScreen();
-            HideMainMap();
-            ShowBattleBackground();
-            SpawnPlayer();
-            SpawnNextEnemy();
-            ShowBattleHUD();
-            ShowSkillBar();
-            ShowBattleControlButton();
-
-        }
-        private void HideBattleScreen()
-        {
-            HideBattleControlButton();
-            ShowLoadingScreen();
-            HideMainMap();
-            HideBattleBackground();
-            HideBattleHUD();
-            HideSkillBar();
-
-            //HideLoadingScreen();
-        }
-        private void HideAll()
-        {
-            HideBattleScreen();
-            HideMainMenu();
-            HideMainMap();
-        }
-
-        private void ShowSkillBar()
-        {
-            if(_skillBar != null)
-            {
-                _skillBar.gameObject.SetActive(true);
-            } else
-            {
-                _skillBar = Instantiate(SkillBarPrefab).GetComponent<SkillBarUIScript>();
-                _skillBar.Initialize(this);
-                _skillBar.UpdateSkillUI();
+                StopAllCoroutines();
+                //Enemy defeated
+                ChangeGameState(GameState.BATTLE_PLAYER_WIN);
+                //SpawnNextEnemy();
             }
 
         }
 
-        private void HideSkillBar()
+        private void ToggleMainMenuScreen(bool value)
         {
-            if(_skillBar == null)
-            {
-                return;
-            }
-
-            _skillBar.gameObject.SetActive(false);
+            ToggleObject(_mainMenuScreen.gameObject, value);
         }
+        private void ToggleMainMapScreen(bool value)
+        {
+            ToggleObject(_mainMapScreen.gameObject, value);
+        }
+        
+        private void ToggleBattleScreen(bool value)
+        {
+            ToggleObject(_battleScreen.gameObject, value);
+
+            if (value == true)
+            {
+                _battleScreen.UpdatePlayerResources(_currentPlayerCharacter);
+                _battleScreen.UpdateEnemyResources(_currentEnemyCharacter);
+            }
+        }
+        private void ToggleAll(bool value)
+        {
+            ToggleMainMapScreen(value);
+            ToggleMainMenuScreen(value);
+            ToggleBattleScreen(value);
+            TogglePlayerCharacter(value);
+        }
+
     }
 
 
@@ -764,8 +629,8 @@ namespace Realmrover
         BATTLE_ENEMY_TURN,
         BATTLE_PLAYER_DEFEAT,
         BATTLE_PLAYER_WIN,
-        END_SCREEN
-
-
+        END_OF_LEVEL,
+        END_SCREEN,
+        TRANSITION
     }
 }

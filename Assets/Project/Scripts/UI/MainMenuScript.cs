@@ -14,7 +14,7 @@ namespace Realmrover {
 
         public void NewGameButton()
         {
-            _gameManager.EnterGameSession();
+            _gameManager.NewGameButtonPressed();
         }
 
         public void SettingsButton()

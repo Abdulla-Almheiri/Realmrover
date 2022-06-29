@@ -16,7 +16,7 @@ namespace Realmrover
 
         public void GoToLevel(int index)
         {
-            _gameManager.StartLevel(index);
+            _gameManager.LevelSelected(index);
         }
     }
 }

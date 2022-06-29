@@ -46,40 +46,45 @@ namespace Realmrover
 
         private void Update()
         {
-            if(Input.GetKeyDown(KeyCode.T))
-            {
-                ClearHealOverTimeEffects();
-            }
         }
-        public void Initialize(CharacterTemplate template, GameManager gameManager, int level = 1, bool isPlayer = false)
+        public void Initialize(GameManager gameManager)
         {
-            _gameManager = gameManager;
-            if (template == null)
+            if (gameManager == null)
             {
                 return;
+            }
+            _gameManager = gameManager;
+
+            _animator = GetComponent<Animator>();
+
+        }
+
+        public void SetCharacterTemplate(CharacterTemplate template, int level = 1)
+        {
+            if(template == null)
+            {
+                Debug.LogWarning("Setting Character Template: Template is null!");
             }
             _template = template;
             _level = level;
             _alive = true;
-            IsPlayer = isPlayer;
 
             _maxHealthPerLevel = template.MaxHealthPerLevel;
             _maxEnergyPerLevel = template.MaxHealthPerLevel;
             _EnergyRegenPerLevel = template.EnergyRegenPerLevel;
             _HealthRegenPerLevel = template.HealthRegenPerLevel;
 
-            _level = template.Level;
-            _currentHealth = template.Health + ( _level - 1 ) * _maxHealthPerLevel;
+            //_level = template.Level;
+            _currentHealth = template.Health + (_level - 1) * _maxHealthPerLevel;
             _maxHealth = _currentHealth;
-            _healthRegen = template.HealthRegen + ( _level - 1 ) * _HealthRegenPerLevel;
-            _energy = template.Energy + ( _level - 1 ) * _maxEnergyPerLevel;
+            _healthRegen = template.HealthRegen + (_level - 1) * _HealthRegenPerLevel;
+            _energy = template.Energy + (_level - 1) * _maxEnergyPerLevel;
             _maxEnergy = _energy;
-            _energyRegen = template.EnergyRegen + ( _level - 1 ) * _EnergyRegenPerLevel;
+            _energyRegen = template.EnergyRegen + (_level - 1) * _EnergyRegenPerLevel;
 
-            _skills = new List<Skill>(template.Skills);
-
-            _animator = GetComponent<Animator>();
             _animator.runtimeAnimatorController = template.AnimationData;
+            _skills = new List<Skill>(template.Skills);
+            _animator.SetTrigger("Revive");
         }
 
         public bool ActivateSkill(int index, Character target)
@@ -193,7 +198,7 @@ namespace Realmrover
 
             SpawnSkillVFX(skill, _gameManager);
 
-            _gameManager.StatsChanged();
+            _gameManager.UpdateResourcesUI();
             return true;
         }
 
@@ -492,8 +497,7 @@ namespace Realmrover
                 _alive = false;
                 _currentHealth = 0;
                 _animator.SetTrigger("Death");
-                Debug.Log("Animator Death");
-                _gameManager.CharacterDead(this);
+                _gameManager.ReportCharacterDeath(this);
             }
         }
 
@@ -741,6 +745,22 @@ namespace Realmrover
             }
         }
 
+        private void ClearAllEffects()
+        {
+            ClearNextDamageBonusAll();
+            ClearNextEnergyBonusAll();
+            ClearHealOverTimeEffects();
+            ClearDamageOverTimeEffects();
+            ClearNextDamageBonusAll();
+            ClearNextEnergyBonusAll();
+            _increaseDamageForTurnsEffects.Clear();
+            _reduceDamageTakenForTurnsEffects.Clear();
+            _reduceEnergyCostForTurnsEffects.Clear();
+            _damageTakenIncreaseForTurnsEffects.Clear();
+            _absorb = 0;
+            _reflect = 0;
+        }
+
         private void SpawnSkillVFX(Skill skill, GameManager gameManager)
         {
             var skillEnemyVFX = skill.EnemySkillPrefab;
@@ -777,19 +797,23 @@ namespace Realmrover
             }
         }
 
-        public void MakeNextMove(Character target, bool expendAllEnergy = false)
+        public bool MakeNextMove(Character target, bool expendAllEnergy = false)
         {
             if (_skills.Count == 0 || IsAlive() == false)
             {
-                return;
+                return false;
             }
 
             int index = Random.Range(0, _skills.Count);
             var skill = _skills[index];
 
-            ActivateSkill(index, target);
+            if(ActivateSkill(index, target) == false)
+            {
+                return false;
+            }
 
             _gameManager.EndTurn(this);
+            return true;
         }
         public List<Skill> Skills()
         {
@@ -803,6 +827,9 @@ namespace Realmrover
         }
         public void EndBattle()
         {
+            ClearAllEffects();
+            /* _currentHealth = MaxHealth();
+             _energy = MaxEnergy();*/
 
         }
         private void TriggerEnergyTick()
@@ -877,6 +904,13 @@ namespace Realmrover
         }
     }
 
+    public enum DamageType
+    {
+        DIRECT,
+        DAMAGE_OVER_TURNS,
+        REFLECT,
+        SACRIFICE
+    }
 
     public class EffectOverTurns
     {
