@@ -43,9 +43,29 @@ namespace Realmrover
         private Dictionary<Skill, EffectOverTurns> _damageTakenIncreaseForTurnsEffects = new Dictionary<Skill, EffectOverTurns>();
 
         private Animator _animator;
+        private SpriteRenderer _spriteRenderer;
+
+        private void OnMouseEnter()
+        {
+            _gameManager.ShowTooltip(this);
+        }
+
+        private void OnMouseExit()
+        {
+            _gameManager.HideTooltip();
+        }
 
         private void Update()
         {
+            if(Input.GetKeyDown(KeyCode.T))
+            {
+                FadeOut(2f);
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                FadeIn(2f);
+            }
         }
         public void Initialize(GameManager gameManager)
         {
@@ -56,7 +76,51 @@ namespace Realmrover
             _gameManager = gameManager;
 
             _animator = GetComponent<Animator>();
+            _spriteRenderer = GetComponent<SpriteRenderer>();
+            
+        }
 
+        public void FadeOut(float duration)
+        {
+            if(duration <= 0f)
+            {
+                _spriteRenderer.color = new Color(1, 1, 1, 0);
+                return;
+            }
+
+            StartCoroutine(FadeOutCO(duration));
+        }
+
+        private IEnumerator FadeOutCO(float duration)
+        {
+            float remainingDuration = duration;
+            while(remainingDuration >=0f)
+            {
+                _spriteRenderer.color = new Color(1, 1, 1, remainingDuration / duration);
+                remainingDuration -= Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        public void FadeIn(float duration)
+        {
+            if (duration <= 0f)
+            {
+                _spriteRenderer.color = new Color(1, 1, 1, 1);
+                return;
+            }
+
+            StartCoroutine(FadeInCO(duration));
+        }
+        private IEnumerator FadeInCO(float duration)
+        {
+            float remainingDuration = duration;
+            while (remainingDuration >= 0f)
+            {
+                _spriteRenderer.color = new Color(1, 1, 1, 1- ( remainingDuration / duration));
+                remainingDuration -= Time.deltaTime;
+                yield return null;
+            }
         }
 
         public void SetCharacterTemplate(CharacterTemplate template, int level = 1)
@@ -118,7 +182,7 @@ namespace Realmrover
                     return false;
                 } else
                 {
-                    TakeDamage(skill.SacrificeDamage, FloatingTextType.SACRIFICE,this, skill, true, false, true);
+                    TakeDamage(skill.SacrificeDamage, FloatingTextType.SACRIFICE, this, skill, true, false, true);
                 }
             }
 
@@ -360,7 +424,7 @@ namespace Realmrover
                     _damageOverTimeEffects.Remove(effect.Source);
                     continue;
                 }
-                var attacker = IsPlayer ? _gameManager.EnemyPrefab.GetComponent<Character>() : _gameManager.PlayerPrefab.GetComponent<Character>();
+                var attacker = _gameManager.CurrentPlayerCharacter() == this ? _gameManager.CurrentEnemyCharacter() : _gameManager.CurrentPlayerCharacter();
                 TakeDamage(effect.Amount, FloatingTextType.DAMAGE_PER_TURN,attacker, effect.Source, true, false, false) ;
                 effect.Turns--;
             }
@@ -479,13 +543,13 @@ namespace Realmrover
 
             _currentHealth -= amount;
 
-            bool spawnAtEnemy = !IsPlayer;
-            if(type == FloatingTextType.SACRIFICE)
+            bool spawnAtEnemy = this == _gameManager.CurrentEnemyCharacter() ? true : false;
+            if (type == FloatingTextType.SACRIFICE)
             {
                 spawnAtEnemy = !spawnAtEnemy;
             }
             
-            _gameManager.SpawnDamageNumber(amount, type, spawnAtEnemy);
+            _gameManager.QueueCombatText(amount, type, spawnAtEnemy);
             _animator.SetTrigger("Hit");
             CheckDead();
         }
@@ -505,7 +569,8 @@ namespace Realmrover
         {
             if (showFloatingText == true)
             {
-                _gameManager.SpawnDamageNumber(amount, textType , !IsPlayer);
+                var atEnemy = _gameManager.CurrentPlayerCharacter() == this ? false :true;
+                _gameManager.QueueCombatText(amount, textType , atEnemy);
             }
             _currentHealth += amount;
 
@@ -764,9 +829,11 @@ namespace Realmrover
         private void SpawnSkillVFX(Skill skill, GameManager gameManager)
         {
             var skillEnemyVFX = skill.EnemySkillPrefab;
+
+            var isPlayer = this == _gameManager.CurrentPlayerCharacter();
             if (skillEnemyVFX != null)
             {
-                var spawnedEffect = Instantiate(skillEnemyVFX, IsPlayer ? gameManager.EnemySpawnPoint : gameManager.PlayerSpawnPoint);
+                var spawnedEffect = Instantiate(skillEnemyVFX, isPlayer ? gameManager.EnemySpawnPoint : gameManager.PlayerSpawnPoint);
                 spawnedEffect.transform.parent = null;
 
             }
@@ -779,7 +846,7 @@ namespace Realmrover
 
             }
 
-            if (IsPlayer)
+            if (isPlayer)
             {
                 if (skill.AnimationType == PlayerAnimationType.SHIELD)
                 {
@@ -828,8 +895,8 @@ namespace Realmrover
         public void EndBattle()
         {
             ClearAllEffects();
-            /* _currentHealth = MaxHealth();
-             _energy = MaxEnergy();*/
+             _currentHealth = MaxHealth();
+             _energy = MaxEnergy();
 
         }
         private void TriggerEnergyTick()
@@ -853,7 +920,7 @@ namespace Realmrover
                 return;
             }
 
-            Heal(_healthRegen, FloatingTextType.HEALTH_REGEN);
+            Heal(_healthRegen, FloatingTextType.HEALTH_REGEN, false);
         }
 
         private int AttributeBasedAddedSkillDamage(Skill skill, Character caster, Character enemy)

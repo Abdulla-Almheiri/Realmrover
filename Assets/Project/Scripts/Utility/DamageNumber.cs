@@ -7,28 +7,29 @@ namespace Realmrover
     {
         private int _value = 0;
         public float Speed = 2f;
+        private  Vector2 _direction = new Vector2(0, 1f);
         private GameManager _gameManager;
 
         private TextMeshProUGUI _textMP;
 
         void Update()
         {
-            transform.Translate(new Vector3(0f, Speed*Time.deltaTime, 0f));
+            transform.Translate(new Vector3(_direction.x*Time.deltaTime*Speed, _direction.y*Speed*Time.deltaTime));
         }
 
         public void Initialize(int value, FloatingTextType textType, Vector2 location, GameManager gameManager)
         {
             _gameManager = gameManager;
             _value = value;
-
+            transform.Translate(location);
             _textMP = GetComponent<TextMeshProUGUI>();
             _textMP.text = value.ToString();
             Destroy(this.gameObject, 5f);
-
+            
             
             //Update colors here
 
-            transform.Translate(location);
+            
             if(gameManager.TextColorsPreset == null)
             {
                 return;
@@ -38,35 +39,39 @@ namespace Realmrover
             {
                 case FloatingTextType.DIRECT_DAMAGE:
                     _textMP.color = gameManager.TextColorsPreset.DirectDamage;
+                    _textMP.fontSize += 8;
                     break;
                 case FloatingTextType.DIRECT_HEAL:
                     _textMP.color = gameManager.TextColorsPreset.DirectHeal;
+                    _textMP.fontSize += 4;
                     break;
                 case FloatingTextType.HEALTH_REGEN:
                     _textMP.color = gameManager.TextColorsPreset.HealthRegen;
-                    //transform.Translate(new Vector3(-2f,0,0));
+                    _textMP.fontSize -= 4;
                     break;
                 case FloatingTextType.ENERGY_REGEN:
                     _textMP.color = gameManager.TextColorsPreset.EnergyRegen;
-                    //transform.Translate(new Vector3(-3f, 0, 0));
+                    _textMP.fontSize -= 4;
                     break;
                 case FloatingTextType.HEAL_PER_TURN:
                     _textMP.color = gameManager.TextColorsPreset.HealPerTurn;
-                    //transform.Translate(new Vector3(1f, 0, 0));
+                    _textMP.fontSize -= 2;
                     break;
                 case FloatingTextType.DAMAGE_PER_TURN:
                     _textMP.color = gameManager.TextColorsPreset.DamagePerTurn;
-                    //transform.Translate(new Vector3(2f, 0, 0));
+                    _textMP.fontSize += 2;
                     break;
                 case FloatingTextType.COMPLETE_ABSORB:
                     _textMP.color = gameManager.TextColorsPreset.CompleteAbsorb;
+                    _textMP.fontSize += 10;
                     break;
                 case FloatingTextType.REFLECT:
                     _textMP.color = gameManager.TextColorsPreset.Reflect;
+                    _textMP.fontSize += 6;
                     break;
                 case FloatingTextType.SACRIFICE:
                     _textMP.color = gameManager.TextColorsPreset.Sacrifice;
-                    //transform.Translate(new Vector3(-4f, 0, 0));
+                    _textMP.fontSize += 2;
                     break;
                 default:
                     break;

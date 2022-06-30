@@ -10,21 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 495ab9ee4906a9940a9a0f241d2c1b52, type: 3}
-  m_Name: Titanoboa
+  m_Name: Bee
   m_EditorClassIdentifier: 
-  Name: Titanoboa
-  Description: A creature thought extinct.
+  Name: Giant Bee
+  Description: Is it a bee or a hornet? Either way it looks dangerous. The pollen
+    seems to heal is constantly!
   Level: 1
-  Health: 150
-  HealthRegen: 4
-  HealthRegenPerLevel: 2
-  MaxHealthPerLevel: 10
+  Health: 40
+  HealthRegen: 10
+  HealthRegenPerLevel: 4
+  MaxHealthPerLevel: 5
   Energy: 20
-  MaxEnergyPerLevel: 2
-  EnergyRegen: 3
+  MaxEnergyPerLevel: 4
+  EnergyRegen: 4
   EnergyRegenPerLevel: 1
   PortraitImage: {fileID: 0}
-  AnimationData: {fileID: 22100000, guid: ee7217c9e6014c6489d9a676cfbc60b5, type: 2}
+  AnimationData: {fileID: 22100000, guid: 16fdd716a522d584483868d486a2f885, type: 2}
   Skills:
-  - {fileID: 11400000, guid: 6a24a79f2de637b4c8d9d107a0a83fa8, type: 2}
   - {fileID: 11400000, guid: 350c36c75d8c4dc4a97937836c45b1f3, type: 2}
+  - {fileID: 11400000, guid: 9bcf22d2e9e05e549ba85aaa57f020bc, type: 2}

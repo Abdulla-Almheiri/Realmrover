@@ -10,6 +10,7 @@ namespace Realmrover
         [Header("Skill")]
         public Sprite Icon;
         public string Name = "";
+        [TextArea]
         public string Description = "";
         public int Level = 1;
 

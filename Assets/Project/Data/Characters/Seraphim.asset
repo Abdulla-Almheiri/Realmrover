@@ -12,15 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 495ab9ee4906a9940a9a0f241d2c1b52, type: 3}
   m_Name: Seraphim
   m_EditorClassIdentifier: 
+  Name: Corrupted Seraphim
+  Description: Seraphims are powerful beings of the Light. Who is powerful enough
+    to corrupt it?!
   Level: 1
-  Health: 100
-  HealthRegen: 5
-  HealthRegenPerLevel: 2
+  Health: 120
+  HealthRegen: 4
+  HealthRegenPerLevel: 1
   MaxHealthPerLevel: 0
-  Energy: 20
-  MaxEnergyPerLevel: 3
-  EnergyRegen: 5
+  Energy: 40
+  MaxEnergyPerLevel: 4
+  EnergyRegen: 6
   EnergyRegenPerLevel: 2
+  PortraitImage: {fileID: 0}
   AnimationData: {fileID: 22100000, guid: 4eae13bf86fd2b44583a7d685133785e, type: 2}
   Skills:
-  - {fileID: 11400000, guid: 94b32e335699d414da494e62556a5191, type: 2}
+  - {fileID: 11400000, guid: b3c29abfa9be0c646b5c128f46a4bf6f, type: 2}

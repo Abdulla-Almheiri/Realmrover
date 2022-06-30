@@ -81,14 +81,20 @@ namespace Realmrover
         public GameObject DamageNumberUIPrefab;
         public TextColors TextColorsPreset;
 
+        [Space(20)]
+        [Header("Tooltip Prefab")]
+        public GameObject TooltipPrefab;
+        private TooltipScript _tooltip;
+
         private bool _playerTurn = true;
         private float _maxAbilityRechargeTime = 1f;
         private float _abilityRechargeTime = 0.5f;
         private float _turnDelayTime = 1f;
         private GameState _gameState = GameState.MAIN_MENU;
         private bool _gameStateDirty = true;
-
-
+        private Queue<FloatingTextQueueMessage> _damageNumbersQueue = new Queue<FloatingTextQueueMessage>();
+        private float _floatingTextDelay = 0.4f;
+        private float _floatingTextTime = 0.4f;
 
         private void Awake()
         {
@@ -103,12 +109,16 @@ namespace Realmrover
         //To be called first in Awake()
         private void Initialize()
         {
+
             InitializeCanvases();
+            InitializeTooltip();
             InitializeMainMenuScreen();
             InitializeMainMapScreen();
             InitializeBattleScreen();
             InitializePlayer();
             InitializeEnemy();
+            //ToggleEnemyCharacter(false);
+            //TogglePlayerCharacter(false);
             //EnterGame();
         }
 
@@ -125,6 +135,7 @@ namespace Realmrover
 
         private void HandleCombat()
         {
+            HandleFloatingText();
             switch (_gameState)
             {
                 case GameState.MAIN_MENU:
@@ -145,14 +156,17 @@ namespace Realmrover
                 case GameState.BATTLE_PLAYER_DEFEAT:
                     break;
                 case GameState.BATTLE_PLAYER_WIN:
-                    if(SpawnNextEnemy())
+                    /*if(SpawnNextEnemy())
                     {
                         ChangeGameState(GameState.BATTLE_PLAYER_TURN, _turnDelayTime);
 
                     } else
                     {
                         ChangeGameState(GameState.END_OF_LEVEL, _turnDelayTime);
-                    }
+                    }*/
+                    break;
+                case GameState.END_OF_LEVEL:
+                    //ToggleEnemyCharacter(false);
                     break;
                 case GameState.END_SCREEN:
                     break;
@@ -162,7 +176,24 @@ namespace Realmrover
                     break;
             }
         }
+        private void HandleFloatingText()
+        {
+            if (_floatingTextTime > 0)
+            {
+                _floatingTextTime -= Time.deltaTime;
+            }
 
+            if(_damageNumbersQueue.Count > 0 && FloatingTextReady() )
+            {
+                ShowNextCombatText();
+                _floatingTextTime = _floatingTextDelay;
+            }
+        }
+
+        private bool FloatingTextReady()
+        {
+            return _floatingTextTime <= 0f;
+        }
         private void HandleEnemyAI()
         {
             _currentEnemyCharacter.MakeNextMove(_currentPlayerCharacter);
@@ -213,6 +244,20 @@ namespace Realmrover
             _staticCanvas.worldCamera = Camera.main;
         }
 
+        private void InitializeTooltip()
+        {
+            if (_tooltip != null)
+            {
+                Debug.LogWarning("Tooltip is already initialized.");
+                return;
+            }
+
+            var spawn = Instantiate(TooltipPrefab, _dynamicCanvas.transform);
+            _tooltip = spawn.GetComponent<TooltipScript>();
+            _tooltip.Initialize(this);
+            HideTooltip();
+
+        }
         private void InitializePlayer(int level = 1)
         {
             InitializeCharacter(true, level);
@@ -285,16 +330,19 @@ namespace Realmrover
             obj.SetActive(value);
         }
 
-        public void SpawnDamageNumber(int value, FloatingTextType textType, bool AtEnemy = true)
+        public void QueueCombatText(int value, FloatingTextType textType, bool atEnemy)
         {
-            if (EnemyPrefab == null || PlayerPrefab == null || _currentEnemyCharacter == null || _currentPlayerCharacter == null)
-            {
-                return;
-            }
+            _damageNumbersQueue.Enqueue(new FloatingTextQueueMessage(value, textType, atEnemy));
+        }
+
+        private void ShowNextCombatText()
+        {
+            var nextDamageNumber = _damageNumbersQueue.Dequeue();
+
             var spawn = Instantiate(DamageNumberUIPrefab, _dynamicCanvas.transform);
             var damageNumber = spawn.GetComponent<DamageNumber>();
-            damageNumber.Initialize(value, textType, AtEnemy ? _currentEnemy.transform.position : _currentPlayer.transform.position, this);
-
+            var location = nextDamageNumber.AtEnemy ? EnemySpawnPoint : PlayerSpawnPoint;
+            damageNumber.Initialize(nextDamageNumber.Value, nextDamageNumber.TextType, location.position, this);
         }
 
         public void EndTurn(Character endedByCharacter)
@@ -340,6 +388,17 @@ namespace Realmrover
                 ToggleMainMapScreen(true);
                 _currentPlayerCharacter.EndBattle();
                 _currentEnemyCharacter.EndBattle();
+            } else if(_gameState == GameState.BATTLE_PLAYER_WIN)
+            {
+                if (SpawnNextEnemy())
+                {
+                    ChangeGameState(GameState.BATTLE_PLAYER_TURN, _turnDelayTime);
+
+                }
+                else
+                {
+                    ChangeGameState(GameState.END_OF_LEVEL, _turnDelayTime);
+                }
             }
 
 
@@ -523,7 +582,8 @@ namespace Realmrover
 
             _currentEnemyCharacter.SetCharacterTemplate(enemyTemplateToSpawn);
  
-            ToggleEnemyCharacter(true);
+            //ToggleEnemyCharacter(true);
+            //TogglePlayerCharacter(true);
             UpdateResourcesUI();
             _gameState = GameState.BATTLE_PLAYER_TURN;
         }
@@ -560,7 +620,7 @@ namespace Realmrover
 
             if(character == _currentPlayerCharacter)
             {
-                StopAllCoroutines();
+                //StopAllCoroutines();
                 ChangeGameState(GameState.BATTLE_PLAYER_DEFEAT);
                 _battleScreen.SetButtonText(BattleControlButtonTextType.BACK_TO_MAIN_MAP);
                 //player died
@@ -568,9 +628,9 @@ namespace Realmrover
 
             if(character == _currentEnemyCharacter)
             {
-                StopAllCoroutines();
+                //StopAllCoroutines();
                 //Enemy defeated
-                ChangeGameState(GameState.BATTLE_PLAYER_WIN);
+                ChangeGameState(GameState.BATTLE_PLAYER_WIN, _turnDelayTime);
                 //SpawnNextEnemy();
             }
 
@@ -594,6 +654,8 @@ namespace Realmrover
                 _battleScreen.UpdatePlayerResources(_currentPlayerCharacter);
                 _battleScreen.UpdateEnemyResources(_currentEnemyCharacter);
             }
+            ToggleEnemyCharacter(value);
+            TogglePlayerCharacter(value);
         }
         private void ToggleAll(bool value)
         {
@@ -601,6 +663,31 @@ namespace Realmrover
             ToggleMainMenuScreen(value);
             ToggleBattleScreen(value);
             TogglePlayerCharacter(value);
+            ToggleEnemyCharacter(value);
+        }
+
+        public void ShowTooltip(Character character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+            _tooltip.gameObject.SetActive(true);
+            _tooltip.SetTooltip(character);
+        }
+        public void ShowTooltip(Skill skill)
+        {
+            if(skill == null)
+            {
+                return;
+            }
+            _tooltip.gameObject.SetActive(true);
+            _tooltip.SetTooltip(skill);
+        }
+
+        public void HideTooltip()
+        {
+            _tooltip.gameObject.SetActive(false);
         }
 
     }
@@ -632,5 +719,19 @@ namespace Realmrover
         END_OF_LEVEL,
         END_SCREEN,
         TRANSITION
+    }
+
+    public class FloatingTextQueueMessage
+    {
+        public int Value;
+        public FloatingTextType TextType;
+        public bool AtEnemy;
+
+        public FloatingTextQueueMessage(int value, FloatingTextType textType, bool atEnemy)
+        {
+            Value = value;
+            TextType = textType;
+            AtEnemy = atEnemy;
+        }
     }
 }

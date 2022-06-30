@@ -7,6 +7,9 @@ namespace Realmrover
     [CreateAssetMenu(fileName ="new character template", menuName ="Characters/Character")]
     public class CharacterTemplate : ScriptableObject
     {
+        public string Name = "";
+        [TextArea]
+        public string Description = "";
         public int Level;
         public int Health = 0;
         public int HealthRegen = 0;

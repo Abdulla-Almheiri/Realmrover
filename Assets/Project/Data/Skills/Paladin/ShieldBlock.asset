@@ -14,16 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Icon: {fileID: 21300000, guid: 5eda20b5bedb9b2458326887a9dbdf1f, type: 3}
   Name: Shield Block
-  Description: Absorbs and reflects the next 10 damage.
+  Description: Absorbs and reflects the next 15 damage.
   Level: 1
-  EnergyCost: 6
+  EnergyCost: 5
   EnergyGain: 0
   BaseDamage: 0
   SacrificeDamage: 0
   SacrificeDamageLethal: 0
   Heal: 0
-  Absorb: 10
-  ReflectDamage: 10
+  Absorb: 15
+  ReflectDamage: 15
   DamagePercentSelfMissingHealth: 0
   DamagePercentEnemyMissingHealth: 0
   DamagePercentSelfAbsorbAmount: 0

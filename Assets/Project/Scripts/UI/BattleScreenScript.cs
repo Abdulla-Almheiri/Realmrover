@@ -10,6 +10,8 @@ namespace Realmrover
     {
         [SerializeField]
         private TMP_Text _battleControlText;
+        [SerializeField]
+        private Button _battleControlButton;
 
         [SerializeField]
         private CharacterResourcesUIScript _playerResources;
@@ -30,9 +32,18 @@ namespace Realmrover
         [SerializeField]
         private Image[] _skillIcons = new Image[7];
         private Button[] _skillButtons = new Button[7];
+        private List<Skill> _skills;
 
         private GameManager _gameManager;
+        private BattleControlButtonTextType _buttonState = BattleControlButtonTextType.END_TURN;
 
+        private void Update()
+        {
+            if(_buttonState == BattleControlButtonTextType.ENEMY_TURN)
+            {
+
+            }
+        }
         public void Initialize(GameManager gameManager)
         {
             _gameManager = gameManager;
@@ -49,6 +60,7 @@ namespace Realmrover
         {
             _playerResources.UpdateCharacterHealth(character.CurrentHealth(), character.MaxHealth());
             _playerResources.UpdateCharacterEnergy(character.CurrentEnergy(), character.MaxEnergy());
+            _playerResources.UpdateCharacterAbsorb(character.AbsorbAmount());
         }
 
         public void UpdateEnemyResources(Character character)
@@ -64,6 +76,7 @@ namespace Realmrover
             {
                 return;
             }
+            _skills = skills;
             for (int i = 0; i < _skillIcons.Length && i < skills.Count; i++)
             {
                 UpdateSkill(i, skills[i]);
@@ -111,7 +124,14 @@ namespace Realmrover
 
         public void BattleControlButtonPressed()
         {
-            _gameManager.EndTurnButtonPress();
+            if (_buttonState == BattleControlButtonTextType.ENEMY_TURN)
+            {
+                return;
+            }
+            else if (_buttonState == BattleControlButtonTextType.END_TURN)
+            {
+                _gameManager.EndTurnButtonPress();
+            }
         }
 
         public void SetButtonText(BattleControlButtonTextType textType)
@@ -120,23 +140,46 @@ namespace Realmrover
             {
                 case BattleControlButtonTextType.END_TURN:
                     _battleControlText.text = "End Turn";
+                    _battleControlButton.interactable = true;
                     break;
                 case BattleControlButtonTextType.BACK_TO_MAIN_MAP:
                     _battleControlText.text = "Main Map";
+                    _battleControlButton.interactable = true;
                     break;
                 case BattleControlButtonTextType.NEXT_BATTLE:
                     _battleControlText.text = "Next Battle";
+                    _battleControlButton.interactable = true;
+                    break;
+                case BattleControlButtonTextType.ENEMY_TURN:
+                    _battleControlText.text = "Enemy Turn";
+                    _battleControlButton.interactable = false;
                     break;
                 default:
                     break;
             }
         }
 
+        public void MouseEnterSkill(int index)
+        {
+            Debug.Log("Mouse Entered  :  " + index);
+            if(index < 0 || index >= _skills.Count)
+            {
+                return;
+            }
+            _gameManager.ShowTooltip(_skills[index]);
+        }
+
+        public void MouseLeaveSkill(int index)
+        {
+            Debug.Log("Mouse Left  :  " + index);
+            _gameManager.HideTooltip();
+        }
     }
 
     public enum BattleControlButtonTextType
     {
         END_TURN,
+        ENEMY_TURN,
         NEXT_BATTLE,
         BACK_TO_MAIN_MAP,
     

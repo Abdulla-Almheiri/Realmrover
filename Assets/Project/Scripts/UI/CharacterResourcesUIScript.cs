@@ -16,9 +16,15 @@ namespace Realmrover
         [SerializeField]
         private RectTransform _characterEnergyBar;
         private float _characterEnergyBarOriginalWidth;
+
         [SerializeField]
         private TMP_Text _energyText;
 
+
+        [SerializeField]
+        private RectTransform _characterAbsorbBar;
+        private float _characterAbsorbBarOriginalWidth;
+        private int _characterAbsorbAmount = 0;
         private void Awake()
         {
             _characterHealthBarOriginalWidth = _characterHealthBar.sizeDelta.x;
@@ -46,6 +52,12 @@ namespace Realmrover
             value /= max;
             UpdateEnergyBar(value);
             UpdateEnergyText(current, max);
+        }
+        public void UpdateCharacterAbsorb(int amount)
+        {
+            float value = (float)amount / _characterHealthBarOriginalWidth;
+           _characterAbsorbBar.sizeDelta = new Vector2(value* _characterHealthBarOriginalWidth, _characterHealthBar.sizeDelta.y);
+            _characterAbsorbAmount = amount;
         }
 
         private void UpdateHealthText(int current, int max)
