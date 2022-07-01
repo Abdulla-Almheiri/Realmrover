@@ -19,6 +19,7 @@ namespace Realmrover
 
         public void UpdateUI(BattleButtonStates buttonState = BattleButtonStates.END_TURN)
         {
+            
             switch(buttonState)
             {
                 case BattleButtonStates.END_TURN:
@@ -28,14 +29,17 @@ namespace Realmrover
                     _textUI.text = "Next Battle";
                     break;
                 case BattleButtonStates.LEAVE:
-                    _textUI.text = "Leave";
+                    _textUI.text = "Main Map";
+                    break;
+                case BattleButtonStates.EMPTY:
+                    _textUI.text = "";
                     break;
             }
         }
 
         public void ButtonPressed()
         {
-            _gameManager.BattleControlButtonPressed(_buttonState);
+            _gameManager.BattleControlButtonPressed();
         }
     }
 
@@ -43,7 +47,8 @@ namespace Realmrover
     {
         END_TURN,
         NEXT_BATTLE,
-        LEAVE
+        LEAVE,
+        EMPTY
 
     }
 }

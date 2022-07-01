@@ -56,16 +56,7 @@ namespace Realmrover
         }
 
         private void Update()
-        {
-            if(Input.GetKeyDown(KeyCode.T))
-            {
-                FadeOut(2f);
-            }
-
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                FadeIn(2f);
-            }
+        { 
         }
         public void Initialize(GameManager gameManager)
         {
@@ -109,7 +100,7 @@ namespace Realmrover
                 _spriteRenderer.color = new Color(1, 1, 1, 1);
                 return;
             }
-
+            //_spriteRenderer.color = new Color(1, 1, 1, 0);
             StartCoroutine(FadeInCO(duration));
         }
         private IEnumerator FadeInCO(float duration)
@@ -148,7 +139,7 @@ namespace Realmrover
 
             _animator.runtimeAnimatorController = template.AnimationData;
             _skills = new List<Skill>(template.Skills);
-            _animator.SetTrigger("Revive");
+            _animator.Play("Idle");
         }
 
         public bool ActivateSkill(int index, Character target)
@@ -791,7 +782,7 @@ namespace Realmrover
             {
                 bool status = _healOverTimeEffects.Count > 0;
                 _healOverTimeEffects.Clear();
-                Debug.Log("HEAL OVER TIME CLEARED. SKILL NULL.");
+                //Debug.Log("HEAL OVER TIME CLEARED. SKILL NULL.");
                 return status;
             }
         }

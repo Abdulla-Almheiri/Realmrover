@@ -25,6 +25,7 @@ namespace Realmrover
         private RectTransform _characterAbsorbBar;
         private float _characterAbsorbBarOriginalWidth;
         private int _characterAbsorbAmount = 0;
+        private int _characterMaxHealth = 0;
         private void Awake()
         {
             _characterHealthBarOriginalWidth = _characterHealthBar.sizeDelta.x;
@@ -36,6 +37,7 @@ namespace Realmrover
             {
                 return;
             }
+            _characterMaxHealth = max;
             float value = current;
             value /= max;
             UpdateHealthBar(value);
@@ -55,7 +57,7 @@ namespace Realmrover
         }
         public void UpdateCharacterAbsorb(int amount)
         {
-            float value = (float)amount / _characterHealthBarOriginalWidth;
+            float value = (float)amount / (float)_characterMaxHealth;
            _characterAbsorbBar.sizeDelta = new Vector2(value* _characterHealthBarOriginalWidth, _characterHealthBar.sizeDelta.y);
             _characterAbsorbAmount = amount;
         }

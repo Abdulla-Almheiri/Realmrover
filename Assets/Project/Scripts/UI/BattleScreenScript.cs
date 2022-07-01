@@ -35,7 +35,7 @@ namespace Realmrover
         private List<Skill> _skills;
 
         private GameManager _gameManager;
-        private BattleControlButtonTextType _buttonState = BattleControlButtonTextType.END_TURN;
+        private BattleControlButtonTextType _buttonState = BattleControlButtonTextType.INITIAL;
 
         private void Update()
         {
@@ -124,18 +124,17 @@ namespace Realmrover
 
         public void BattleControlButtonPressed()
         {
-            if (_buttonState == BattleControlButtonTextType.ENEMY_TURN)
-            {
-                return;
-            }
-            else if (_buttonState == BattleControlButtonTextType.END_TURN)
-            {
-                _gameManager.EndTurnButtonPress();
-            }
+            _gameManager.BattleControlButtonPressed();
         }
 
         public void SetButtonText(BattleControlButtonTextType textType)
         {
+            /*if(textType == _buttonState)
+            {
+                return;
+            }*/
+
+            textType = _buttonState;
             switch (textType)
             {
                 case BattleControlButtonTextType.END_TURN:
@@ -152,6 +151,10 @@ namespace Realmrover
                     break;
                 case BattleControlButtonTextType.ENEMY_TURN:
                     _battleControlText.text = "Enemy Turn";
+                    _battleControlButton.interactable = false;
+                    break;
+                case BattleControlButtonTextType.EMPTY:
+                    _battleControlText.text = "";
                     _battleControlButton.interactable = false;
                     break;
                 default:
@@ -174,14 +177,21 @@ namespace Realmrover
             Debug.Log("Mouse Left  :  " + index);
             _gameManager.HideTooltip();
         }
+
+        public void ToggleEnemyResources(bool value)
+        {
+            _enemyResources.gameObject.SetActive(value);
+        }
     }
 
     public enum BattleControlButtonTextType
     {
+        INITIAL,
         END_TURN,
         ENEMY_TURN,
         NEXT_BATTLE,
         BACK_TO_MAIN_MAP,
+        EMPTY
     
     }
 }

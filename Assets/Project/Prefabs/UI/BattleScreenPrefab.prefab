@@ -3463,7 +3463,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -52.3}
-  m_SizeDelta: {x: 32, y: 12}
+  m_SizeDelta: {x: 36, y: 12}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8150078936251151346
 CanvasRenderer:
@@ -3502,7 +3502,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 2
 --- !u!114 &197538609776940247
 MonoBehaviour:
   m_ObjectHideFlags: 0
