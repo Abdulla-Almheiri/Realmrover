@@ -129,12 +129,12 @@ namespace Realmrover
 
         public void SetButtonText(BattleControlButtonTextType textType)
         {
-            /*if(textType == _buttonState)
+            if(textType == _buttonState)
             {
                 return;
-            }*/
+            }
 
-            textType = _buttonState;
+            _buttonState = textType;
             switch (textType)
             {
                 case BattleControlButtonTextType.END_TURN:

@@ -18,7 +18,7 @@ MonoBehaviour:
   Level: 1
   EnergyCost: 5
   EnergyGain: 0
-  BaseDamage: 15
+  BaseDamage: 100
   SacrificeDamage: 0
   SacrificeDamageLethal: 0
   Heal: 0

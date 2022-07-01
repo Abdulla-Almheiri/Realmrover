@@ -19,7 +19,7 @@ namespace Realmrover {
 
         public void SettingsButton()
         {
-
+            _gameManager.ShowSettingsMenu();
         }
 
         public void QuitButton()

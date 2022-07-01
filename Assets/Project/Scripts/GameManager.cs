@@ -34,6 +34,11 @@ namespace Realmrover
         private Sprite _defaultBackgroundImage;
 
         [Space(20)]
+        [Header("Settings Menu")]
+        public GameObject SettingsMenuPrefab; 
+        private SettingsMenuScript _settingsMenu;
+
+        [Space(20)]
         [Header("Main Menu")]
         public GameObject MainMenuScreenPrefab;
         private MainMenuScript _mainMenuScreen;
@@ -56,6 +61,7 @@ namespace Realmrover
         private int _currentEnemyInLevelIndex = 0;
         private GameLevel _currentGameLevel;
         private int _currentGameLevelIndex = 0;
+        private int _maxLevelUnlocked = 1;
 
         [Space(20)]
         [Header("Spawn Locations")]
@@ -103,6 +109,9 @@ namespace Realmrover
         private GameState _previousGameState;
         private bool _battleControlButtonPressed = false;
 
+        private float _soundVolume = 1f;
+        private float _musicVolume = 1f;
+
         private void Awake()
         {
             Initialize();
@@ -136,8 +145,10 @@ namespace Realmrover
         {
 
             InitializeCanvases();
+            InitializeSettingsMenu();
             InitializeTooltip();
             InitializeMainMenuScreen();
+            InitializeSFX();
             InitializeMainMapScreen();
             InitializeBattleScreen();
             InitializePlayer();
@@ -152,7 +163,17 @@ namespace Realmrover
             EnterGame();
         }
 
+        private void InitializeSFX()
+        {
+            _soundVolume = PlayerPrefs.GetFloat("SoundVolume");
+            _musicVolume = PlayerPrefs.GetFloat("MusicVolume");
+        }
 
+        public void SaveSettings()
+        {
+            PlayerPrefs.SetFloat("SoundVolume", _soundVolume);
+            PlayerPrefs.SetFloat("MusicVolume", _musicVolume);
+        }
         //To be called every frame in Update()
         private void HandleGame()
         {
@@ -205,6 +226,7 @@ namespace Realmrover
                 {
                     ChangeGameState(GameState.END_OF_LEVEL);
                     _battleScreen.SetButtonText(BattleControlButtonTextType.BACK_TO_MAIN_MAP);
+
                 } else
                 {
                     _battleScreen.SetButtonText(BattleControlButtonTextType.NEXT_BATTLE);
@@ -239,7 +261,9 @@ namespace Realmrover
                     _currentPlayerCharacter.EndBattle();
                     _currentEnemyCharacter.EndBattle();
                     ChangeGameState(GameState.MAIN_MAP, TurnDelay);
-                    
+                    _maxLevelUnlocked++;
+                    _mainMapScreen.UpdateLayout(_maxLevelUnlocked);
+
                 }
 
             }
@@ -341,7 +365,13 @@ namespace Realmrover
             _screenTransitionCanvas.worldCamera = Camera.main;
             _screenTransition = _screenTransitionCanvas.GetComponent<TransitionCanvasScript>();
         }
-
+        private void InitializeSettingsMenu()
+        {
+            var spawn = Instantiate(SettingsMenuPrefab, _dynamicCanvas.transform);
+            _settingsMenu = spawn.GetComponent<SettingsMenuScript>();
+            _settingsMenu.Initialize(this);
+            _settingsMenu.gameObject.SetActive(false);
+        }
         private void InitializeTooltip()
         {
             if (_tooltip != null)
@@ -406,7 +436,10 @@ namespace Realmrover
         {
             ToggleObject(_currentPlayer, value);
         }
-
+        public void ShowSettingsMenu()
+        {
+            _settingsMenu.gameObject.SetActive(true);
+        }
         private void ToggleEnemyCharacter(bool value)
         {
             ToggleObject(_currentEnemy, value);
@@ -603,7 +636,7 @@ namespace Realmrover
             return _abilityRechargeTime >= 0.1f;
         }
 
-        private void ChangeGameState(GameState newState, float delay = 0f, bool transition = false)
+        private void ChangeGameState(GameState newState, float delay = 0f, bool transition = true)
         {
             if(delay == 0f)
             {
@@ -623,7 +656,7 @@ namespace Realmrover
         private IEnumerator SwitchStateDelayCO(GameState newState, float delay)
         {
             GameState = GameState.BATTLE_TRANSITION;
-            StartCoroutine(ScreenTransitionCO(delay));
+            //StartCoroutine(ScreenTransitionCO(delay));
             yield return new WaitForSeconds(delay);
             GameState = newState;
             Debug.Log("Game State Changed to :   " + GameState.ToString());
