@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29d0d1a242dcfef48aa731feb6cbd188, type: 3}
+  m_Name: Vine Lash
+  m_EditorClassIdentifier: 
+  Icon: {fileID: 0}
+  Name: Vine Lash
+  Description: Deals 5 damage plus 30 over 3 turns. Deals more direct damage based
+    on target's absorb amount.
+  Level: 1
+  EnergyCost: 4
+  EnergyGain: 0
+  BaseDamage: 5
+  SacrificeDamage: 0
+  SacrificeDamageLethal: 0
+  Heal: 0
+  Absorb: 0
+  ReflectDamage: 0
+  DamagePercentSelfMissingHealth: 0
+  DamagePercentEnemyMissingHealth: 0
+  DamagePercentSelfAbsorbAmount: 0
+  DamagePercentEnemyAbsorbAmount: 100
+  HealPerTurn: 0
+  HealTurns: 0
+  HealOverTimeStacks: 0
+  HealOverTimeRefreshesDuration: 1
+  IncreaseDamageForTurns: 0
+  IncreaseDamageTurns: 0
+  ReduceDamageTakenForTurns: 0
+  ReduceDamageTakenTurns: 0
+  ReduceEnergyCostForTurns: 0
+  ReduceEnergyCostTurns: 0
+  DamagePerTurn: 10
+  DamageTurns: 3
+  DamageOverTimeStacks: 0
+  DamageOverTimeRefreshesDuration: 1
+  ReduceDamageDone: 0
+  ReduceDamageDoneTurns: 0
+  IncreaseDamageTakenForTurns: 0
+  IncreaseDamageTakenTurns: 0
+  EnhanceNextDamage: 0
+  EnhanceNextEnergyCost: 0
+  EnhanceNextSkill: {fileID: 0}
+  EnemySkillPrefab: {fileID: 9011296371463313218, guid: 70bea9060f47b6448bb91dea794d7a0c, type: 3}
+  SelfSkillPrefab: {fileID: 0}
+  SoundEffect: {fileID: 0}
+  CameraShakePower: 1
+  AnimationType: 1

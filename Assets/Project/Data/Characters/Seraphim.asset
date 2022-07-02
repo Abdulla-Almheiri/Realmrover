@@ -19,7 +19,7 @@ MonoBehaviour:
   Health: 120
   HealthRegen: 4
   HealthRegenPerLevel: 1
-  MaxHealthPerLevel: 0
+  MaxHealthPerLevel: 10
   Energy: 40
   MaxEnergyPerLevel: 4
   EnergyRegen: 6

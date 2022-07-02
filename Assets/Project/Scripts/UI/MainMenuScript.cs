@@ -14,11 +14,13 @@ namespace Realmrover {
 
         public void NewGameButton()
         {
+            _gameManager.PlayClickSound();
             _gameManager.NewGameButtonPressed();
         }
 
         public void SettingsButton()
         {
+            _gameManager.PlayClickSound();
             _gameManager.ShowSettingsMenu();
         }
 

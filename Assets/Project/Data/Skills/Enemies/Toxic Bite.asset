@@ -51,4 +51,5 @@ MonoBehaviour:
   EnhanceNextSkill: {fileID: 0}
   EnemySkillPrefab: {fileID: 8299941733052616721, guid: a2b8925ff3394c34198c6a8bbf1caf8b, type: 3}
   SelfSkillPrefab: {fileID: 0}
+  CameraShakePower: 0
   AnimationType: 1

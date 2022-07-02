@@ -16,7 +16,7 @@ MonoBehaviour:
   Name: Heaven's Wrath
   Description: Deals 20 damage plus an amount equal to 100% of your missing health
   Level: 1
-  EnergyCost: 12
+  EnergyCost: 8
   EnergyGain: 0
   BaseDamage: 20
   SacrificeDamage: 0
@@ -51,4 +51,6 @@ MonoBehaviour:
   EnhanceNextSkill: {fileID: 0}
   EnemySkillPrefab: {fileID: 971680748741051436, guid: e309437427be4dc49b1cba3bcea47385, type: 3}
   SelfSkillPrefab: {fileID: 0}
+  SoundEffect: {fileID: 8300000, guid: caca069429aa9c347a39a56258809064, type: 3}
+  CameraShakePower: 3
   AnimationType: 0

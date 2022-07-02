@@ -16,7 +16,7 @@ MonoBehaviour:
   Name: Shield Block
   Description: Absorbs and reflects the next 15 damage.
   Level: 1
-  EnergyCost: 5
+  EnergyCost: 7
   EnergyGain: 0
   BaseDamage: 0
   SacrificeDamage: 0
@@ -51,4 +51,6 @@ MonoBehaviour:
   EnhanceNextSkill: {fileID: 0}
   EnemySkillPrefab: {fileID: 0}
   SelfSkillPrefab: {fileID: 7540108035479543248, guid: 46d18b1683e119d43bd3df3ecea97e32, type: 3}
+  SoundEffect: {fileID: 8300000, guid: 10e6b40dd83525c41be87b2071e037d7, type: 3}
+  CameraShakePower: 0
   AnimationType: 1

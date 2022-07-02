@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Giant Bee
   Description: Is it a bee or a hornet? Either way it looks dangerous. The pollen
-    seems to heal is constantly!
+    seems to heal it constantly!
   Level: 1
-  Health: 40
+  Health: 80
   HealthRegen: 10
   HealthRegenPerLevel: 4
   MaxHealthPerLevel: 5

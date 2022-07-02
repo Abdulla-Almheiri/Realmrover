@@ -9,11 +9,11 @@ AnimatorOverrideController:
   m_Name: Titanoboa
   m_Controller: {fileID: 9100000, guid: 35ed06cce16080b44b68340a73df5809, type: 2}
   m_Clips:
-  - m_OriginalClip: {fileID: 7400000, guid: d025ae166f87d394bb64b9b1d9fa2ef7, type: 2}
-    m_OverrideClip: {fileID: 7400000, guid: 050f6280b3c95944b9043142657e50cb, type: 2}
-  - m_OriginalClip: {fileID: 7400000, guid: 47ad0432e86c94b439a9081536700830, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 927d98380b1f3db4f88ec5263ac2a1a9, type: 2}
     m_OverrideClip: {fileID: 7400000, guid: 7617b6a1170d787498a49f040a6632d0, type: 2}
-  - m_OriginalClip: {fileID: 7400000, guid: a11238de845233d47af5ce90cc900db1, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: ab12fc2f8a0ac2c4eb07e76f02b48d91, type: 2}
     m_OverrideClip: {fileID: 7400000, guid: 622a289c2c010e9429e1ff86f06df980, type: 2}
-  - m_OriginalClip: {fileID: 7400000, guid: 26ca6514f3580344490d083bd40eda07, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 418caf8440ff02a4080ec8cb8f6e7572, type: 2}
     m_OverrideClip: {fileID: 7400000, guid: d98470e0c5dbe4544a957c27fec478a7, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 2bd94514c65d9b244b2f0f81e5cc1d83, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 050f6280b3c95944b9043142657e50cb, type: 2}

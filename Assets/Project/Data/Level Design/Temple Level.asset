@@ -16,4 +16,6 @@ MonoBehaviour:
   Background: {fileID: 21300000, guid: 9999c264b3d163542af4566cf0bcf1e4, type: 3}
   Enemies:
   - Level: 5
+    Template: {fileID: 11400000, guid: 05a786f4af740554a8bfabc052c9ac9e, type: 2}
+  - Level: 10
     Template: {fileID: 11400000, guid: 89026c8a778404e47909b4247a719ec5, type: 2}

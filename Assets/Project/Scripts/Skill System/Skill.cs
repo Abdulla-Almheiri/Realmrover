@@ -64,6 +64,13 @@ namespace Realmrover
         public GameObject EnemySkillPrefab = null;
         public GameObject SelfSkillPrefab = null;
 
+        [Header("Skill SFX")]
+        public AudioClip SoundEffect = null;
+
+        [Header("Camera Shake")]
+        [Range(0, 3)]
+        public int CameraShakePower = 0;
+
         [Header("Player Animation")]
         public PlayerAnimationType AnimationType = PlayerAnimationType.SHIELD;
     }

@@ -24,7 +24,7 @@ MonoBehaviour:
   EnergyRegen: 5
   EnergyRegenPerLevel: 1
   PortraitImage: {fileID: 21300000, guid: 3c1726ba76e68364dbcdb4a9d9c52c34, type: 3}
-  AnimationData: {fileID: 9100000, guid: 949ee52a45dcfcf4da48171b37f48ebf, type: 2}
+  AnimationData: {fileID: 22100000, guid: f62bedf75da09c447b48d807541ecf4a, type: 2}
   Skills:
   - {fileID: 11400000, guid: 94b32e335699d414da494e62556a5191, type: 2}
   - {fileID: 11400000, guid: 1c667f69d64372d4186a43125b15b1e1, type: 2}

@@ -17,5 +17,3 @@ MonoBehaviour:
   Enemies:
   - Level: 1
     Template: {fileID: 11400000, guid: 73414b0208af8b04ea9ec9b85c2bf285, type: 2}
-  - Level: 1
-    Template: {fileID: 11400000, guid: 05a786f4af740554a8bfabc052c9ac9e, type: 2}

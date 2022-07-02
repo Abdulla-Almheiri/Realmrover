@@ -66,8 +66,11 @@ namespace Realmrover
 
         public void ConfirmSettings()
         {
+            _gameManager.PlayClickSound();
             PlayerPrefs.SetFloat("SoundVolume", _soundVolume);
             PlayerPrefs.SetFloat("MusicVolume", _musicVolume);
+            Debug.Log("Volume is :  " + _soundVolume);
+            _gameManager.UpdateAudioSourceVolume();
             gameObject.SetActive(false);
         }
     }

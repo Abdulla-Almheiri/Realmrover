@@ -18,7 +18,7 @@ MonoBehaviour:
   Level: 1
   EnergyCost: 5
   EnergyGain: 0
-  BaseDamage: 20
+  BaseDamage: 25
   SacrificeDamage: 10
   SacrificeDamageLethal: 1
   Heal: 0
@@ -51,4 +51,6 @@ MonoBehaviour:
   EnhanceNextSkill: {fileID: 0}
   EnemySkillPrefab: {fileID: 9011296371463313218, guid: 70bea9060f47b6448bb91dea794d7a0c, type: 3}
   SelfSkillPrefab: {fileID: 0}
+  SoundEffect: {fileID: 0}
+  CameraShakePower: 2
   AnimationType: 1

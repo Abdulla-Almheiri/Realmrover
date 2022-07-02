@@ -15,7 +15,9 @@ MonoBehaviour:
   Name: Jungle
   Background: {fileID: 21300000, guid: b7ef4142f66ee84448c90f0dffb72f74, type: 3}
   Enemies:
-  - Level: 5
+  - Level: 3
     Template: {fileID: 11400000, guid: 37e2fba96065bc349bc1ca7f5d0d19b3, type: 2}
-  - Level: 5
+  - Level: 4
     Template: {fileID: 11400000, guid: 73414b0208af8b04ea9ec9b85c2bf285, type: 2}
+  - Level: 5
+    Template: {fileID: 11400000, guid: bb24b866fb703bd4b8e89b78c22549c9, type: 2}

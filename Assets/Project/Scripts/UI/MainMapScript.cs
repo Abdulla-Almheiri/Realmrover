@@ -19,6 +19,7 @@ namespace Realmrover
 
         public void GoToLevel(int index)
         {
+            _gameManager.PlayClickSound();
             _gameManager.LevelSelected(index);
         }
 

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Icon: {fileID: 21300000, guid: 9f77221f87cb69e4e92bacc9b0ddeeba, type: 3}
   Name: Shield Charge
-  Description: 'Shield Charge: Deals 10 damage plus 150% of your Absorb amount.'
+  Description: 'Shield Charge: Deals 10 damage plus 100% of your Absorb amount.'
   Level: 1
   EnergyCost: 4
   EnergyGain: 0
@@ -26,7 +26,7 @@ MonoBehaviour:
   ReflectDamage: 0
   DamagePercentSelfMissingHealth: 0
   DamagePercentEnemyMissingHealth: 0
-  DamagePercentSelfAbsorbAmount: 150
+  DamagePercentSelfAbsorbAmount: 100
   DamagePercentEnemyAbsorbAmount: 0
   HealPerTurn: 0
   HealTurns: 0
@@ -51,4 +51,6 @@ MonoBehaviour:
   EnhanceNextSkill: {fileID: 0}
   EnemySkillPrefab: {fileID: 9011296371463313218, guid: 70bea9060f47b6448bb91dea794d7a0c, type: 3}
   SelfSkillPrefab: {fileID: 0}
+  SoundEffect: {fileID: 8300000, guid: 10e6b40dd83525c41be87b2071e037d7, type: 3}
+  CameraShakePower: 2
   AnimationType: 1

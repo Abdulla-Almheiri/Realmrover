@@ -252,7 +252,11 @@ namespace Realmrover
             }
 
             SpawnSkillVFX(skill, _gameManager);
-
+            _gameManager.PlaySound(skill);
+            if(skill.CameraShakePower > 0)
+            {
+                _gameManager.ShakeCamera(skill.CameraShakePower);
+            }
             _gameManager.UpdateResourcesUI();
             return true;
         }
@@ -870,7 +874,7 @@ namespace Realmrover
                 return false;
             }
 
-            _gameManager.EndTurn(this);
+            //_gameManager.EndTurn(this);
             return true;
         }
         public List<Skill> Skills()

@@ -95,6 +95,21 @@ namespace Realmrover
         public GameObject TooltipPrefab;
         private TooltipScript _tooltip;
 
+        [Space(20)]
+        [Header("Level Name Box Prefab")]
+        public GameObject LevelNameBoxPrefab;
+        private LevelNameBoxScript _levelNameBox;
+
+        [Space(20)]
+        [Header("Sound")]
+        [SerializeField]
+        private AudioSource _audioSource;
+        [SerializeField]
+        private AudioClip _clickSound;
+        [SerializeField]
+        private AudioSource _musicSource;
+        [SerializeField]
+        private AudioClip _battleTrack;
 
         private bool _playerTurn = true;
         private float _maxAbilityRechargeTime = 1f;
@@ -108,6 +123,7 @@ namespace Realmrover
         private float _floatingTextTime = 0.4f;
         private GameState _previousGameState;
         private bool _battleControlButtonPressed = false;
+        private bool _levelSelected = false;
 
         private float _soundVolume = 1f;
         private float _musicVolume = 1f;
@@ -147,6 +163,7 @@ namespace Realmrover
             InitializeCanvases();
             InitializeSettingsMenu();
             InitializeTooltip();
+            InitializeLevelNameBox();
             InitializeMainMenuScreen();
             InitializeSFX();
             InitializeMainMapScreen();
@@ -167,23 +184,37 @@ namespace Realmrover
         {
             _soundVolume = PlayerPrefs.GetFloat("SoundVolume");
             _musicVolume = PlayerPrefs.GetFloat("MusicVolume");
+            _audioSource.volume = _soundVolume;
+            _musicSource.volume = _musicVolume;
         }
 
-        public void SaveSettings()
+        public void UpdateAudioSourceVolume()
         {
-            PlayerPrefs.SetFloat("SoundVolume", _soundVolume);
-            PlayerPrefs.SetFloat("MusicVolume", _musicVolume);
+            _audioSource.volume = PlayerPrefs.GetFloat("SoundVolume");
+            _musicSource.volume = PlayerPrefs.GetFloat("MusicVolume");
         }
         //To be called every frame in Update()
         private void HandleGame()
         {
-            if(GameState == GameState.BATTLE_PLAYER_TURN)
-            {
-
-            }
             HandleBattle();
         }
+        public void PlayClickSound()
+        {
+            _audioSource.PlayOneShot(_clickSound);
+        }
 
+        public void PlayBattleMusic(bool value)
+        {
+            if(value == true)
+            {
+                _musicSource.mute = false;
+            } else
+            {
+                _musicSource.mute = true;
+            }
+
+            
+        }
         private void HandleBattle()
         {
 
@@ -199,11 +230,41 @@ namespace Realmrover
                 return;
             }
 
+            if(GameState == GameState.INTRODUCING_LEVEL)
+            {
+                ToggleAll(false);
+                ToggleBattleScreen(true);
+                _battleScreen.ToggleEnemyResources(false);
+                _currentEnemyCharacter.FadeIn(TurnDelay * 2);
+                _battleScreen.UpdateBackground(_gameLevels[_currentGameLevelIndex].Background);
+                ToggleLevelNameBox(true);
+                _levelNameBox.SetName(_gameLevels[_currentGameLevelIndex].Name);
+                _levelNameBox.FadeOut(0f);
+                _levelNameBox.FadeIn(TurnDelay*2);
+                ChangeGameState(GameState.BATTLE_ENTERED, TurnDelay*4);
+
+            }
+            if(GameState == GameState.BATTLE_ENTERED)
+            {
+                Debug.Log("BATTLE ENTERED");
+                
+                _battleScreen.SetButtonText(BattleControlButtonTextType.EMPTY);
+                TogglePlayerCharacter(true);
+                ToggleEnemyCharacter(true);
+                _battleScreen.ToggleEnemyResources(true);
+                UpdateResourcesUI();
+                _levelNameBox.FadeOut(TurnDelay*2);
+                ChangeGameState(GameState.BATTLE_START, TurnDelay);
+            }
+
             if (GameState == GameState.BATTLE_START)
             {
                 // First turn is decided here
+                //ToggleLevelNameBox(false);
+                ToggleBattleScreen(true);
                 _battleScreen.SetButtonText(BattleControlButtonTextType.END_TURN);
                 ChangeGameState(GameState.BATTLE_PLAYER_TURN, TurnDelay);
+                
             }
 
             if(GameState == GameState.BATTLE_PLAYER_TURN)
@@ -220,38 +281,32 @@ namespace Realmrover
                 HandleEnemyAI();
             }
 
+
+            //fix here
             if(GameState == GameState.BATTLE_PLAYER_WIN)
             {
-                if(IsEndOfLevel())
+                _battleScreen.SetButtonText(BattleControlButtonTextType.EMPTY);
+               
+                if(IsEndOfLevel() == true)
                 {
                     ChangeGameState(GameState.END_OF_LEVEL);
-                    _battleScreen.SetButtonText(BattleControlButtonTextType.BACK_TO_MAIN_MAP);
-
                 } else
                 {
                     _battleScreen.SetButtonText(BattleControlButtonTextType.NEXT_BATTLE);
                     if (_battleControlButtonPressed == true)
                     {
+                        _battleScreen.SetButtonText(BattleControlButtonTextType.EMPTY);
+                        SpawnNextEnemy();
                         _battleControlButtonPressed = false;
-                        if (SpawnNextEnemy())
-                        {
-                            ChangeGameState(GameState.BATTLE_START, TurnDelay);
-                            _battleScreen.SetButtonText(BattleControlButtonTextType.EMPTY);
-                        }
-                        else
-                        {
-                            ChangeGameState(GameState.END_OF_LEVEL, TurnDelay);
-                            _battleScreen.SetButtonText(BattleControlButtonTextType.EMPTY);
-                        }
-
-                        
+                        _currentEnemyInLevelIndex++;
                     }
-
                 }
+    
             }
 
             if (GameState == GameState.END_OF_LEVEL)
             {
+                _battleScreen.ToggleEnemyResources(false);
                 _battleScreen.SetButtonText(BattleControlButtonTextType.BACK_TO_MAIN_MAP);
                 if(_battleControlButtonPressed == true)
                 {
@@ -279,7 +334,7 @@ namespace Realmrover
                     ToggleAll(false);
                     ToggleMainMapScreen(true);
                     ChangeGameState(GameState.MAIN_MAP, TurnDelay);
-
+                    _currentPlayerCharacter.SetCharacterTemplate(PlayerTemplate);
                 }
             }
         }
@@ -316,7 +371,7 @@ namespace Realmrover
         }
         private bool IsEndOfLevel()
         {
-            return _gameLevels[_currentGameLevelIndex].Enemies.Count == (_currentEnemyInLevelIndex-1) ;
+            return _currentEnemyInLevelIndex >= _gameLevels[_currentGameLevelIndex].Enemies.Count;
         }
         private void InitializeMainMenuScreen()
         {
@@ -385,6 +440,22 @@ namespace Realmrover
             _tooltip.Initialize(this);
             HideTooltip();
 
+        }
+        private void InitializeLevelNameBox()
+        {
+            if(_levelNameBox != null)
+            {
+                return;
+            }
+
+            var spawn = Instantiate(LevelNameBoxPrefab, _dynamicCanvas.transform);
+            _levelNameBox = spawn.GetComponent<LevelNameBoxScript>();
+            _levelNameBox.Initialize(this);
+            ToggleLevelNameBox(false);
+        }
+        private void ToggleLevelNameBox(bool value)
+        {
+            _levelNameBox.gameObject.SetActive(value);
         }
         private void InitializePlayer(int level = 1)
         {
@@ -483,15 +554,17 @@ namespace Realmrover
 
                 if (endedByCharacter == _currentPlayerCharacter)
                 {
-                    _currentPlayerCharacter.EndTurn();
+                    
                     ChangeGameState(GameState.BATTLE_ENEMY_TURN, TurnDelay);
                 }
                 else if (endedByCharacter == _currentEnemyCharacter)
                 {
-                    _currentEnemyCharacter.EndTurn();
+                    
                     ChangeGameState(GameState.BATTLE_PLAYER_TURN, TurnDelay);
                 }
 
+                _currentPlayerCharacter.EndTurn();
+                _currentEnemyCharacter.EndTurn();
                 UpdateResourcesUI();
             }
         }
@@ -636,7 +709,7 @@ namespace Realmrover
             return _abilityRechargeTime >= 0.1f;
         }
 
-        private void ChangeGameState(GameState newState, float delay = 0f, bool transition = true)
+        private void ChangeGameState(GameState newState, float delay = 0f, bool transition = false)
         {
             if(delay == 0f)
             {
@@ -656,13 +729,14 @@ namespace Realmrover
         private IEnumerator SwitchStateDelayCO(GameState newState, float delay)
         {
             GameState = GameState.BATTLE_TRANSITION;
-            //StartCoroutine(ScreenTransitionCO(delay));
+            StartCoroutine(ScreenTransitionCO(delay, true));
             yield return new WaitForSeconds(delay);
             GameState = newState;
-            Debug.Log("Game State Changed to :   " + GameState.ToString());
+            StartCoroutine(ScreenTransitionCO(delay, false));
+            //Debug.Log("Game State Changed to :   " + GameState.ToString());
         }
 
-        private IEnumerator ScreenTransitionCO(float duration)
+        private IEnumerator ScreenTransitionCO(float duration, bool fadeIn)
         {
             if(duration == 0f)
             {
@@ -672,7 +746,7 @@ namespace Realmrover
             Image image = _screenTransition.ScreenPanel();
             while (duration > 0)
             {
-                image.color = new Color(0, 0, 0, Mathf.Sin((1-(duration/originalDuration))*Mathf.PI));
+                image.color = new Color(0, 0, 0, fadeIn? (1-(duration/originalDuration)): (duration/originalDuration));
                 duration -= Time.deltaTime;
                 yield return null;
             }
@@ -701,6 +775,7 @@ namespace Realmrover
 
         public void NewGameButtonPressed()
         {
+            
             ToggleAll(false);
             _battleScreen.UpdatePlayerSkillBar(_currentPlayerCharacter);
             ToggleMainMapScreen(true);
@@ -721,25 +796,23 @@ namespace Realmrover
             }
 
             _currentGameLevelIndex = index;
-            ToggleAll(false);
-            ToggleBattleScreen(true);
-            _battleScreen.UpdateBackground(_gameLevels[_currentGameLevelIndex].Background);
-            _battleScreen.SetButtonText(BattleControlButtonTextType.END_TURN);
-            TogglePlayerCharacter(true);
+            _levelSelected = true;
             _currentEnemyInLevelIndex = 0;
             var enemyTemplateToSpawn = _gameLevels[index].Enemies[_currentEnemyInLevelIndex].Template;
-            if(enemyTemplateToSpawn == null)
+            /*if(enemyTemplateToSpawn == null)
             {
                 //Debug.LogWarning("Level Selected: Enemy template in current level is null!");
                 return;
-            }
+            }*/
 
             _currentEnemyCharacter.SetCharacterTemplate(enemyTemplateToSpawn);
  
             //ToggleEnemyCharacter(true);
             //TogglePlayerCharacter(true);
-            UpdateResourcesUI();
-            GameState = GameState.BATTLE_PLAYER_TURN;
+            
+            //GameState = GameState.BATTLE_PLAYER_TURN;
+            ChangeGameState(GameState.INTRODUCING_LEVEL, TurnDelay, true);
+            PlayBattleMusic(true);
         }
 
         private void UpdateCurrentBattleBackground()
@@ -750,29 +823,34 @@ namespace Realmrover
         public bool SpawnNextEnemy()
         {
             var enemyList = _gameLevels[_currentGameLevelIndex].Enemies;
-            if (enemyList == null || _currentEnemyInLevelIndex >= enemyList.Count-1)
+            if (enemyList == null || _currentEnemyInLevelIndex+1 >= enemyList.Count)
             {
                 //Debug.Log("Spawning Next Enemy: No more enemies to spawn.");
                 //_battleScreen.SetButtonText(BattleControlButtonTextType.BACK_TO_MAIN_MAP);
                 return false;
             }
-            StartCoroutine(SpawnEnemyCO(enemyList[_currentEnemyInLevelIndex + 1].Template));
+            
+            StartCoroutine(SpawnEnemyCO(enemyList[_currentEnemyInLevelIndex+1].Template));
+            
             return true;
         }
+
+        
 
         private IEnumerator SpawnEnemyCO(CharacterTemplate characterTemplate)
         {
             CurrentEnemyCharacter().FadeOut(TurnDelay);
             _battleScreen.ToggleEnemyResources(false);
             yield return new WaitForSeconds(TurnDelay);
-            _currentEnemyInLevelIndex++;
+            //_currentEnemyInLevelIndex++;
             _currentEnemyCharacter.EndBattle();
-            _currentEnemyCharacter.SetCharacterTemplate(characterTemplate);
+            _currentEnemyCharacter.SetCharacterTemplate(characterTemplate, _gameLevels[_currentGameLevelIndex].Enemies[_currentEnemyInLevelIndex].Level);
             CurrentEnemyCharacter().FadeIn(TurnDelay);
             yield return new WaitForSeconds(TurnDelay);
             _battleScreen.ToggleEnemyResources(true);
             UpdateResourcesUI();
             ChangeGameState(GameState.BATTLE_START);
+            
         }
 
         public void ReportCharacterDeath(Character character)
@@ -786,16 +864,17 @@ namespace Realmrover
             if(character == _currentPlayerCharacter)
             {
                 //StopAllCoroutines();
-                ChangeGameState(GameState.BATTLE_PLAYER_DEFEAT, TurnDelay);
+                ChangeGameState(GameState.BATTLE_PLAYER_DEFEAT);
                 //_battleScreen.SetButtonText(BattleControlButtonTextType.BACK_TO_MAIN_MAP);
                 //player died
+                Debug.Log("PLAYER DIED");
             }
 
             if(character == _currentEnemyCharacter)
             {
                 //StopAllCoroutines();
                 //Enemy defeated
-                ChangeGameState(GameState.BATTLE_PLAYER_WIN, TurnDelay);
+                ChangeGameState(GameState.BATTLE_PLAYER_WIN);
                 //SpawnNextEnemy();
             }
 
@@ -808,6 +887,10 @@ namespace Realmrover
         private void ToggleMainMapScreen(bool value)
         {
             ToggleObject(_mainMapScreen.gameObject, value);
+            if(value == true)
+            {
+                PlayBattleMusic(false);
+            }
         }
         
         private void ToggleBattleScreen(bool value)
@@ -818,6 +901,10 @@ namespace Realmrover
             {
                 _battleScreen.UpdatePlayerResources(_currentPlayerCharacter);
                 _battleScreen.UpdateEnemyResources(_currentEnemyCharacter);
+                PlayBattleMusic(true);
+            } else
+            {
+                PlayBattleMusic(false);
             }
             ToggleEnemyCharacter(value);
             TogglePlayerCharacter(value);
@@ -871,7 +958,16 @@ namespace Realmrover
             _tooltip.gameObject.SetActive(false);
         }
 
-        public void ShakeCamera(float amount, float duration)
+        public void PlaySound(Skill skill)
+        {
+            if(skill == null || skill.SoundEffect == null)
+            {
+                return;
+            }
+            _audioSource.PlayOneShot(skill.SoundEffect);
+        }
+
+        public void ShakeCamera(float amount, float duration = 1f)
         {
             if(duration <= 0)
             {
@@ -880,21 +976,24 @@ namespace Realmrover
             StartCoroutine(ShakeCameraCO(amount, duration));
         }
 
-        private IEnumerator ShakeCameraCO(float amount, float duration)
+        private IEnumerator ShakeCameraCO(float amount, float duration, float delay = 0.5f)
         {
             Camera cam = Camera.main;
             float originalDuration = duration;
-            Vector3 originalPos = new Vector3(cam.transform.position.x, cam.transform.position.y, cam.transform.position.z);
+            //Vector3 originalPos = new Vector3(cam.transform.position.x, cam.transform.position.y, cam.transform.position.z);
+            yield return new WaitForSeconds(delay);
+            amount /= 3f;
             while (duration > 0)
             {
+                amount /= 1.3f;
                 Vector3 pos = new Vector3(Random.Range(-amount, amount), Random.Range(-amount, amount), cam.transform.position.z);
                 //pos = Vector3.Lerp(pos, originalPos, (1-duration) / originalDuration);
                 cam.transform.position = pos;
                 duration -= Time.deltaTime;
-                amount /= 1.5f;
+                
                 yield return null;
             }
-            cam.transform.position = originalPos;
+            cam.transform.localPosition = Vector3.zero;
         }
 
     }
@@ -918,6 +1017,7 @@ namespace Realmrover
         MAIN_MENU,
         MAIN_MENU_SETTINGS,
         MAIN_MAP,
+        BATTLE_ENTERED,
         BATTLE_START,
         BATTLE_PLAYER_TURN,
         BATTLE_ENEMY_TURN,
@@ -927,7 +1027,9 @@ namespace Realmrover
         END_SCREEN,
         BATTLE_TRANSITION,
         SCREEN_TRANSITION,
-        SHOWING_MESSAGE
+        SCREEN_TRANSITIONING,
+        SHOWING_MESSAGE,
+        INTRODUCING_LEVEL
     }
 
     public class FloatingTextQueueMessage
