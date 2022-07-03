@@ -17,12 +17,12 @@ MonoBehaviour:
   Level: 1
   Health: 80
   HealthRegen: 4
-  HealthRegenPerLevel: 1
-  MaxHealthPerLevel: 4
+  HealthRegenPerLevel: 0
+  MaxHealthPerLevel: 0
   Energy: 25
   MaxEnergyPerLevel: 1
   EnergyRegen: 5
-  EnergyRegenPerLevel: 1
+  EnergyRegenPerLevel: 0
   PortraitImage: {fileID: 21300000, guid: 3c1726ba76e68364dbcdb4a9d9c52c34, type: 3}
   AnimationData: {fileID: 22100000, guid: f62bedf75da09c447b48d807541ecf4a, type: 2}
   Skills:

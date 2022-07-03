@@ -19,8 +19,11 @@ namespace Realmrover
 
         public void GoToLevel(int index)
         {
-            _gameManager.PlayClickSound();
-            _gameManager.LevelSelected(index);
+            if (_gameManager.GameState == GameState.MAIN_MAP || _gameManager.GameState == GameState.ENTERING_MAIN_MAP)
+            {
+                _gameManager.PlayClickSound();
+                _gameManager.LevelSelected(index);
+            }
         }
 
         public void UpdateLayout(int levelReached)

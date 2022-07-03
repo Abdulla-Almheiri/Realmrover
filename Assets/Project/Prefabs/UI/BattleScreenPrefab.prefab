@@ -1544,7 +1544,7 @@ RectTransform:
   - {fileID: 131088902851153167}
   - {fileID: 131088903003830341}
   m_Father: {fileID: 131088904109240447}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
@@ -1649,9 +1649,9 @@ RectTransform:
   - {fileID: 5242713853061703837}
   - {fileID: 7404533964464078876}
   - {fileID: 131088902433090476}
+  - {fileID: 2594266539894511815}
   - {fileID: 131088903949542967}
   - {fileID: 892529078396556418}
-  - {fileID: 2594266539894511815}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1915,7 +1915,7 @@ RectTransform:
   - {fileID: 1297764472573546044}
   - {fileID: 2298291722787630762}
   m_Father: {fileID: 131088904109240447}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3096,8 +3096,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 6
-  m_fontSizeBase: 6
+  m_fontSize: 5
+  m_fontSizeBase: 5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3458,12 +3458,12 @@ RectTransform:
   m_Children:
   - {fileID: 7005197159850810926}
   m_Father: {fileID: 131088904109240447}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -52.3}
-  m_SizeDelta: {x: 36, y: 12}
+  m_AnchoredPosition: {x: 0, y: -49.64}
+  m_SizeDelta: {x: 32, y: 32}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8150078936251151346
 CanvasRenderer:
@@ -3493,8 +3493,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: db99b1162f6df3942bbfde69dcc9599c, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: 779ab00d6cf9929499ee63e9684b21a8, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -3502,7 +3502,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 2
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &197538609776940247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3524,12 +3524,12 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.4528302, g: 0.44215024, b: 0.44215024, a: 1}
-    m_PressedColor: {r: 0.26415092, g: 0.26041293, b: 0.26041293, a: 1}
+    m_NormalColor: {r: 0.5471698, g: 0.53942686, b: 0.53942686, a: 1}
+    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_PressedColor: {r: 1, g: 1, b: 1, a: 1}
     m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
-    m_DisabledColor: {r: 0.6603774, g: 0.21493416, b: 0.21493416, a: 0.5019608}
-    m_ColorMultiplier: 1
+    m_DisabledColor: {r: 0.8962264, g: 0.8962264, b: 0.8962264, a: 0.56078434}
+    m_ColorMultiplier: 2
     m_FadeDuration: 0.2
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}

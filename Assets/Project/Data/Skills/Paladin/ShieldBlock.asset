@@ -15,7 +15,7 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: 5eda20b5bedb9b2458326887a9dbdf1f, type: 3}
   Name: Shield Block
   Description: Absorbs and reflects the next 15 damage.
-  Level: 1
+  Level: 2
   EnergyCost: 7
   EnergyGain: 0
   BaseDamage: 0

@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 066abf6080cdbee469ed40039d69ce6d, type: 3}
+  m_Name: TutorialData
+  m_EditorClassIdentifier: 
+  TutorialSteps:
+  - Message: Welcome to the tutorial!
+    WaitForSkill: {fileID: 0}
+    WaitForEndOfTurn: 0
+  - Message: This is turn-based combat.
+    WaitForSkill: {fileID: 0}
+    WaitForEndOfTurn: 0
+  - Message: You may use as many abilities as you like as long as you have enough
+      energy.
+    WaitForSkill: {fileID: 0}
+    WaitForEndOfTurn: 0
+  - Message: Your energy, along with your health, is shown under your character.
+    WaitForSkill: {fileID: 0}
+    WaitForEndOfTurn: 0
+  - Message: When you are finished. Click the "End Turn" button to end your turn
+      and gain some energy. Try it!
+    WaitForSkill: {fileID: 0}
+    WaitForEndOfTurn: 1
+  - Message: 'Your Abilities are shown at the bottom of the screen. Hover over them
+      to read their description. '
+    WaitForSkill: {fileID: 0}
+    WaitForEndOfTurn: 0
+  - Message: To activate an Ability, click it. Or use your Keyboard by pressing the
+      corresponding number. Activate Smite!
+    WaitForSkill: {fileID: 11400000, guid: 94b32e335699d414da494e62556a5191, type: 2}
+    WaitForEndOfTurn: 0
+  - Message: Good job! Smite deals direct damage. Useful if you want to defeat your
+      enemies!
+    WaitForSkill: {fileID: 0}
+    WaitForEndOfTurn: 0
+  - Message: Unfortunately, enemies too can deal direct damage which is why you need
+      to defend yourself. Activate Shield Block to absorb some damage!
+    WaitForSkill: {fileID: 11400000, guid: 1c667f69d64372d4186a43125b15b1e1, type: 2}
+    WaitForEndOfTurn: 0
+  - Message: Good job! Your Absorb amount is indicated on your Health Bar.
+    WaitForSkill: {fileID: 0}
+    WaitForEndOfTurn: 0
+  - Message: Some Abilities deal their damage over a number of turns. Activate Holy
+      Slash!
+    WaitForSkill: {fileID: 11400000, guid: f6aaebaa4fb5c2849bee9b93ce9f73ba, type: 2}
+    WaitForEndOfTurn: 0
+  - Message: Good job! You can also recover some missing Health by using a Healing
+      Ability. Activate Prayer!
+    WaitForSkill: {fileID: 11400000, guid: 715e2cb08c1944a479f9437f4d6b0bb4, type: 2}
+    WaitForEndOfTurn: 0
+  - Message: Good job! Some Abilities are more potent under certain conditions! Activate
+      Shield Charge!
+    WaitForSkill: {fileID: 11400000, guid: 5ac9daafa3a069549b36311cad4c1d85, type: 2}
+    WaitForEndOfTurn: 0
+  - Message: Good job! Here is another one! Activate Heaven's Wrath!
+    WaitForSkill: {fileID: 11400000, guid: ab9663710eee0a0408334fdc3c450f87, type: 2}
+    WaitForEndOfTurn: 0
+  - Message: We are almost done. Your next Ability carries a penalty. Use it smartly!
+      Go on, do not be afraid. Try it!
+    WaitForSkill: {fileID: 11400000, guid: 80c0c0200a7604c4b83ce9a53588c2a4, type: 2}
+    WaitForEndOfTurn: 0
+  - Message: Well done! This is the end of this tutorial. Good luck on your adventures!
+    WaitForSkill: {fileID: 0}
+    WaitForEndOfTurn: 0

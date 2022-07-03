@@ -50,7 +50,7 @@ MonoBehaviour:
   EnhanceNextDamage: 0
   EnhanceNextEnergyCost: 0
   EnhanceNextSkill: {fileID: 0}
-  EnemySkillPrefab: {fileID: 9011296371463313218, guid: 70bea9060f47b6448bb91dea794d7a0c, type: 3}
+  EnemySkillPrefab: {fileID: 8173865227765677200, guid: 1a61b5bd56fee5642a2552cca1e7f32a, type: 3}
   SelfSkillPrefab: {fileID: 0}
   SoundEffect: {fileID: 0}
   CameraShakePower: 1

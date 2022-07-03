@@ -15,8 +15,8 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: 9f77221f87cb69e4e92bacc9b0ddeeba, type: 3}
   Name: Shield Charge
   Description: 'Shield Charge: Deals 10 damage plus 100% of your Absorb amount.'
-  Level: 1
-  EnergyCost: 4
+  Level: 5
+  EnergyCost: 6
   EnergyGain: 0
   BaseDamage: 10
   SacrificeDamage: 0

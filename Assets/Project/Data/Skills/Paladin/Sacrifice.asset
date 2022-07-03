@@ -15,7 +15,7 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: f042af5439350ae43aee41a4824b3ea9, type: 3}
   Name: Sacrifice
   Description: Sacrifices 20 Health to deal 20 damage to the enemy.
-  Level: 1
+  Level: 7
   EnergyCost: 0
   EnergyGain: 0
   BaseDamage: 20

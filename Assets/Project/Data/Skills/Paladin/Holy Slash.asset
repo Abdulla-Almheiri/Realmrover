@@ -15,7 +15,7 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: 890ae7f149f36ca4482407973375b8ba, type: 3}
   Name: Holy Slash
   Description: Deals 10 damage plus 30 over 5 turns.
-  Level: 1
+  Level: 3
   EnergyCost: 4
   EnergyGain: 0
   BaseDamage: 10

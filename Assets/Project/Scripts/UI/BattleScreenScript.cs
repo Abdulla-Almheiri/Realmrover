@@ -114,6 +114,14 @@ namespace Realmrover
                 return;
             }
 
+            if(value == false)
+            {
+                _skillIcons[index].sprite = _defaultSkillIcon;
+            } else
+            {
+                _skillIcons[index].sprite = _gameManager.CurrentPlayerCharacter().Skills()[index].Icon;
+            }
+            
             _skillButtons[index].interactable = value;
         }
 

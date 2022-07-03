@@ -64,6 +64,7 @@ namespace Realmrover
             _bottomLeftText.text = "";
             _bottomRightText.text = "";
             _nextButton.gameObject.SetActive(false);
+
         }
 
         public void NextButtonPressed()
