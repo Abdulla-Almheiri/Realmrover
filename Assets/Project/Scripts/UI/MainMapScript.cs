@@ -7,6 +7,7 @@ namespace Realmrover
 {
     public class MainMapScript : MonoBehaviour
     {
+        [SerializeField] private TooltipScript _levelTooltip;
         [SerializeField] List<Button> _levelNodes;
         private const int MaxLevel = 3;
         private GameManager _gameManager;
@@ -45,6 +46,17 @@ namespace Realmrover
             {
                 _levelNodes[i].gameObject.SetActive(false);
             }
+        }
+
+        public void HoverOverLevel(int index)
+        {
+            _levelTooltip.gameObject.SetActive(true);
+            _levelTooltip.SetTooltip(_gameManager.GameLevelByIndex(index));
+        }
+
+        public void HideLevelTooltip()
+        {
+            _levelTooltip.gameObject.SetActive(false);
         }
     }
 }

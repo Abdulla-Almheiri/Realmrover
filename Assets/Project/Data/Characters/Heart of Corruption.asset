@@ -15,14 +15,14 @@ MonoBehaviour:
   Name: Heart of Corruption
   Description: Organic yet ephemeral. Corrupts anything it touches!
   Level: 1
-  Health: 300
-  HealthRegen: 10
-  HealthRegenPerLevel: 3
-  MaxHealthPerLevel: 20
+  Health: 250
+  HealthRegen: 4
+  HealthRegenPerLevel: 1
+  MaxHealthPerLevel: 10
   Energy: 40
-  MaxEnergyPerLevel: 6
-  EnergyRegen: 10
-  EnergyRegenPerLevel: 2
+  MaxEnergyPerLevel: 2
+  EnergyRegen: 5
+  EnergyRegenPerLevel: 1
   PortraitImage: {fileID: 0}
   AnimationData: {fileID: 22100000, guid: b80259c11d3163e4185f680252ce66c3, type: 2}
   Skills:

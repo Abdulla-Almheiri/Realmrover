@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: Yateveo
   Description: Looks like a carnivorous plant!
   Level: 1
-  Health: 130
+  Health: 120
   HealthRegen: 8
   HealthRegenPerLevel: 2
   MaxHealthPerLevel: 8

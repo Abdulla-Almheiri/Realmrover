@@ -63,7 +63,7 @@ namespace Realmrover
         private List<GameLevel> _gameLevels = new List<GameLevel>();
         private int _currentEnemyInLevelIndex = 0;
         private GameLevel _currentGameLevel;
-        private int _currentGameLevelIndex = 0;
+        private int _currentGameLevelIndex = -1;
         private int _maxLevelUnlocked = 1;
 
         [Space(20)]
@@ -81,7 +81,8 @@ namespace Realmrover
         public Canvas ScreenTransitionCanvasPrefab;
         private Canvas _screenTransitionCanvas;
         private TransitionCanvasScript _screenTransition;
-
+        [SerializeField]
+        private GameObject EndScreenPrefab;
 
         public GameObject EnemyPrefab;
         private GameObject _currentEnemy;
@@ -138,6 +139,7 @@ namespace Realmrover
         private Skill _lastAbilityUsed;
         private bool _tutorialStarted = false;
         private int _lastAbilityShown = 0;
+        private bool _messageNextButtonPressed = false;
         private void Awake()
         {
             Initialize();
@@ -160,9 +162,14 @@ namespace Realmrover
 
         public void MessageNextButtonPressed()
         {
+            if(GameState == GameState.MAIN_MAP)
+            {
+                return;
+            }
             GameState = _previousGameState;
             _tooltip.Clear();
             HideTooltip();
+            _messageNextButtonPressed = true;
 
         }
         private void CheckIfTutorialDone()
@@ -176,6 +183,7 @@ namespace Realmrover
             if(check == 1)
             {
                 _mainMapScreen.UpdateLayout(2);
+                _maxLevelUnlocked++;
             }
         }
 
@@ -193,7 +201,11 @@ namespace Realmrover
             InitializeBattleScreen();
             InitializePlayer();
             InitializeEnemy();
+
+
             CheckIfTutorialDone();
+
+
             //ToggleEnemyCharacter(false);
             //TogglePlayerCharacter(false);
             //EnterGame();
@@ -254,6 +266,11 @@ namespace Realmrover
                 return;
             }
 
+            if(GameState == GameState.SCREEN_TRANSITION)
+            {
+                return;
+            }
+
             if(GameState == GameState.MAIN_MENU)
             {
                 if(_newGameStarted == true)
@@ -269,14 +286,19 @@ namespace Realmrover
 
             if(GameState == GameState.ENTERING_MAIN_MAP)
             {
-                ChangeGameState(GameState.MAIN_MAP, TurnDelay);
+                ChangeGameState(GameState.MAIN_MAP);
                 
             }
 
             if(GameState == GameState.INTRODUCING_LEVEL)
             {
+                if (_currentGameLevelIndex == -1)
+                {
+                    HideAllAbilityIcons();
 
+                }
 
+                _battleControlButtonPressed = false;
                 ToggleAll(false);
                 ToggleBattleScreen(true);
                 _battleScreen.ToggleEnemyResources(false);
@@ -287,10 +309,12 @@ namespace Realmrover
                 _levelNameBox.FadeOut(0f);
                 _levelNameBox.FadeIn(TurnDelay);
                 ChangeGameState(GameState.BATTLE_ENTERED);
+
             }
 
             if(GameState == GameState.BATTLE_ENTERED)
             {
+                
                 ToggleBattleScreen(true);
                 _battleScreen.SetButtonText(BattleControlButtonTextType.EMPTY);
                 TogglePlayerCharacter(true);
@@ -303,14 +327,27 @@ namespace Realmrover
 
             if (GameState == GameState.BATTLE_START)
             {
+                if (_currentGameLevelIndex == -1)
+                {
+                    _currentGameLevelIndex++;
+                }
+
+                if (_currentGameLevelIndex == 0)
+                {
+                    StartTutorial();
+                }
                 _battleScreen.SetButtonText(BattleControlButtonTextType.END_TURN);
                 ChangeGameState(GameState.BATTLE_PLAYER_TURN, TurnDelay);
                 
             }
 
+            if (WaitForTutorialCondition() == true && _currentGameLevelIndex == 0)
+            {
+                Debug.Log("Tutorial condition true");
+                ContinueTutorial();
+            }
 
-
-            if(GameState == GameState.BATTLE_PLAYER_TURN)
+            if (GameState == GameState.BATTLE_PLAYER_TURN)
             {
 
                 _battleScreen.SetButtonText(BattleControlButtonTextType.END_TURN);
@@ -319,7 +356,7 @@ namespace Realmrover
                 {
                     EndTurn(_currentPlayerCharacter);
                     _battleControlButtonPressed = false;
-                    ChangeGameState(GameState.BATTLE_ENEMY_TURN);
+                    ChangeGameState(GameState.BATTLE_ENEMY_TURN, TurnDelay);
                 }
             }
 
@@ -364,6 +401,10 @@ namespace Realmrover
             {
                 _battleScreen.ToggleEnemyResources(false);
                 _battleScreen.SetButtonText(BattleControlButtonTextType.BACK_TO_MAIN_MAP);
+                if(_currentGameLevelIndex == 2)
+                {
+                    ChangeGameState(GameState.END_SCREEN, TurnDelay);
+                }
                 if(_battleControlButtonPressed == true)
                 {
                     _battleControlButtonPressed = false;
@@ -372,18 +413,30 @@ namespace Realmrover
                     _currentPlayerCharacter.EndBattle();
                     _currentEnemyCharacter.EndBattle();
                     ChangeGameState(GameState.MAIN_MAP, TurnDelay);
-                    _maxLevelUnlocked++;
+
+                    if (_currentGameLevelIndex == 0)
+                    {
+                        _maxLevelUnlocked = 2;
+                    } else
+                    {
+                        _maxLevelUnlocked++;
+                    }
+
                     _mainMapScreen.UpdateLayout(_maxLevelUnlocked);
-                    _currentTutorialStep = 0;
+                    //_currentTutorialStep = 0;
+
+                    RestartTutorial();
                 }
 
             }
 
             if(GameState == GameState.BATTLE_PLAYER_DEFEAT)
             {
+                
                 _battleScreen.SetButtonText(BattleControlButtonTextType.BACK_TO_MAIN_MAP);
                 if(_battleControlButtonPressed == true)
                 {
+                    
                     _battleControlButtonPressed = false;
                     _currentPlayerCharacter.EndBattle();
                     _currentEnemyCharacter.EndBattle();
@@ -393,6 +446,16 @@ namespace Realmrover
                     _currentPlayerCharacter.SetCharacterTemplate(PlayerTemplate);
                 }
             }
+
+            if(GameState == GameState.END_SCREEN)
+            {
+                ToggleAll(false);
+                Instantiate(EndScreenPrefab, _dynamicCanvas.transform);
+                ChangeGameState(GameState.SCREEN_TRANSITION);
+                PlayBattleMusic(false);
+            }
+
+
         }
 
         private void HandleScreenTransitions()
@@ -629,6 +692,12 @@ namespace Realmrover
         }
         private void HandlePlayerInput()
         {
+            if(_currentPlayerCharacter.IsAlive() == false)
+            {
+                ChangeGameState(GameState.BATTLE_PLAYER_DEFEAT);
+                return;
+            }
+
             if (GameState != GameState.BATTLE_PLAYER_TURN )
             {
                 return;
@@ -699,6 +768,7 @@ namespace Realmrover
 
         private void ChangeGameState(GameState newState, float delay = 0f, bool transition = false)
         {
+            
             if(delay == 0f)
             {
                 GameState = newState;
@@ -785,13 +855,14 @@ namespace Realmrover
                 return;
             }
 
+            
             _currentGameLevelIndex = index;
+  
             _levelSelected = true;
             _currentEnemyInLevelIndex = 0;
             var enemyTemplateToSpawn = _gameLevels[index].Enemies[_currentEnemyInLevelIndex].Template;
 
             _currentEnemyCharacter.SetCharacterTemplate(enemyTemplateToSpawn);
-
             ChangeGameState(GameState.INTRODUCING_LEVEL, TurnDelay, true);
             PlayBattleMusic(true);
         }
@@ -841,7 +912,8 @@ namespace Realmrover
 
             if(character == _currentPlayerCharacter)
             {
-                ChangeGameState(GameState.BATTLE_PLAYER_DEFEAT, TurnDelay);
+                ChangeGameState(GameState.BATTLE_PLAYER_DEFEAT);
+                
             }
 
             if(character == _currentEnemyCharacter)
@@ -970,28 +1042,32 @@ namespace Realmrover
 
         public void StartTutorial()
         {
-            
-            if(_tutorialStarted == true)
-            { 
+            if(_currentTutorialStep > 0 )
+            {
                 return;
             }
-            for(int i = 1; i<7; i++)
+            HideAllAbilityIcons();
+            ShowTooltip(_tutorialData.TutorialSteps[_currentTutorialStep].Message);
+            //_currentTutorialStep++;
+
+        }
+
+        private void HideAllAbilityIcons()
+        {
+            for (int i = 1; i < 7; i++)
             {
                 _battleScreen.ToggleAbility(i, false);
             }
-            ShowTooltip(_tutorialData.TutorialSteps[_currentTutorialStep].Message);
-
         }
 
         public void RestartTutorial()
         {
             _currentTutorialStep = 0;
-            _tutorialStarted = false;
         }
 
         public bool WaitForTutorialCondition()
         {
-            if(_tutorialStarted == false)
+            if(GameState == GameState.MAIN_MAP || GameState == GameState.ENTERING_MAIN_MAP)
             {
                 return false;
             }
@@ -999,12 +1075,32 @@ namespace Realmrover
             if(_currentTutorialStep >= _tutorialData.TutorialSteps.Count)
             {
                 PlayerPrefs.SetInt("TutorialDone", 1);
+                Debug.Log("tutorial finished");
                 return false;
             }
 
             var currentTutorialStep = _tutorialData.TutorialSteps[_currentTutorialStep];
 
-            if(currentTutorialStep.WaitForEndOfTurn == true)
+            if(currentTutorialStep.WaitForEndOfTurn == false)
+            {
+                if(currentTutorialStep.WaitForSkill == null)
+                {
+                    if(_messageNextButtonPressed)
+                    {
+                        return true;
+                    } else
+                    {
+                        return false;
+                    }
+                } else if(_lastAbilityUsed == currentTutorialStep.WaitForSkill)
+                {
+                    return true;
+                } else
+                {
+                    return false;
+                }
+ 
+            } else 
             {
                 if(_battleControlButtonPressed == true)
                 {
@@ -1013,23 +1109,47 @@ namespace Realmrover
                 {
                     return false;
                 }
-            } else
+            }
+            /*if(currentTutorialStep.WaitForEndOfTurn == true)
             {
-                if(_lastAbilityUsed == currentTutorialStep.WaitForSkill)
+                if(_battleControlButtonPressed == true)
                 {
+                    
                     return true;
                 } else
                 {
                     return false;
                 }
+            } else if (currentTutorialStep.WaitForSkill == null)
+            {
+
             }
+                if(currentTutorialStep.WaitForSkill == null)
+                {
+                    if(_messageNextButtonPressed == true)
+                    {
+                        _messageNextButtonPressed = false;
+                        return true;
+                    }
+
+                } else if(_lastAbilityUsed == currentTutorialStep.WaitForSkill)
+                {
+                    return true;
+                } else
+                {
+                    return false;
+                }*/
+                //return false;
+            
+
         }
 
         public void ContinueTutorial()
         {
             _lastAbilityUsed = null;
             _currentTutorialStep++;
-            if(_currentTutorialStep >= _tutorialData.TutorialSteps.Count)
+            
+            if (_currentTutorialStep >= _tutorialData.TutorialSteps.Count)
             {
                 _currentEnemyCharacter.TakeDamage(100000, FloatingTextType.DIRECT_DAMAGE, _currentPlayerCharacter, _currentPlayerCharacter.Skills()[0], true, true, true);
                 return;
@@ -1050,6 +1170,16 @@ namespace Realmrover
 
             _battleScreen.ToggleAbility(_lastAbilityShown, true);
             _lastAbilityShown++;
+        }
+
+        public GameLevel GameLevelByIndex(int index)
+        {
+            if (index < 0 || index >= _gameLevels.Count)
+            {
+                return null;
+            }
+
+            else return _gameLevels[index];
         }
     }
 
@@ -1086,7 +1216,7 @@ namespace Realmrover
         SHOWING_MESSAGE,
         INTRODUCING_LEVEL,
         ENTERING_MAIN_MAP,
-        SPAWNING_NEXT_ENEMY
+        SPAWNING_NEXT_ENEMY,
     }
 
     public class FloatingTextQueueMessage

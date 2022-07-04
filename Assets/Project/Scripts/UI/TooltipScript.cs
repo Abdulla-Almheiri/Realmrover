@@ -55,6 +55,14 @@ namespace Realmrover
             _nextButton.gameObject.SetActive(true);
         }
 
+        public void SetTooltip(GameLevel gameLevel)
+        {
+            Clear();
+            _mainText.text = gameLevel.Description;
+            _titleText.text = gameLevel.Name;
+
+        }
+
         public void Clear()
         {
             _titleText.text = "";

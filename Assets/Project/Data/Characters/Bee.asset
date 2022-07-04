@@ -16,7 +16,7 @@ MonoBehaviour:
   Description: Is it a bee or a hornet? Either way it looks dangerous. The pollen
     seems to heal it constantly!
   Level: 1
-  Health: 80
+  Health: 90
   HealthRegen: 10
   HealthRegenPerLevel: 4
   MaxHealthPerLevel: 5
@@ -27,5 +27,5 @@ MonoBehaviour:
   PortraitImage: {fileID: 0}
   AnimationData: {fileID: 22100000, guid: 16fdd716a522d584483868d486a2f885, type: 2}
   Skills:
-  - {fileID: 11400000, guid: 350c36c75d8c4dc4a97937836c45b1f3, type: 2}
   - {fileID: 11400000, guid: 9bcf22d2e9e05e549ba85aaa57f020bc, type: 2}
+  - {fileID: 11400000, guid: 350c36c75d8c4dc4a97937836c45b1f3, type: 2}

@@ -8,6 +8,8 @@ namespace Realmrover
     public class GameLevel : ScriptableObject
     {
         public string Name;
+        [TextArea]
+        public string Description;
         public Sprite Background;
 
         public List<EnemyEntry> Enemies = new List<EnemyEntry>();

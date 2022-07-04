@@ -16,22 +16,22 @@ MonoBehaviour:
   - Message: Welcome to the tutorial!
     WaitForSkill: {fileID: 0}
     WaitForEndOfTurn: 0
-  - Message: This is turn-based combat.
+  - Message: The combat in Realmrover is turn-based.
     WaitForSkill: {fileID: 0}
     WaitForEndOfTurn: 0
-  - Message: You may use as many abilities as you like as long as you have enough
-      energy.
+  - Message: You may use as many abilities as you like in one turn as long as you
+      have enough energy. Enemies will only use one Ability per turn.
     WaitForSkill: {fileID: 0}
     WaitForEndOfTurn: 0
-  - Message: Your energy, along with your health, is shown under your character.
+  - Message: Your energy, along with your health, are shown under your character.
     WaitForSkill: {fileID: 0}
     WaitForEndOfTurn: 0
   - Message: When you are finished. Click the "End Turn" button to end your turn
       and gain some energy. Try it!
     WaitForSkill: {fileID: 0}
     WaitForEndOfTurn: 1
-  - Message: 'Your Abilities are shown at the bottom of the screen. Hover over them
-      to read their description. '
+  - Message: 'Well done! Your Abilities are shown at the bottom of the screen. Hover
+      over them to read their description. '
     WaitForSkill: {fileID: 0}
     WaitForEndOfTurn: 0
   - Message: To activate an Ability, click it. Or use your Keyboard by pressing the
@@ -49,8 +49,8 @@ MonoBehaviour:
   - Message: Good job! Your Absorb amount is indicated on your Health Bar.
     WaitForSkill: {fileID: 0}
     WaitForEndOfTurn: 0
-  - Message: Some Abilities deal their damage over a number of turns. Activate Holy
-      Slash!
+  - Message: 'Some Abilities deal their damage over a number of turns. Activate Holy
+      Slash! '
     WaitForSkill: {fileID: 11400000, guid: f6aaebaa4fb5c2849bee9b93ce9f73ba, type: 2}
     WaitForEndOfTurn: 0
   - Message: Good job! You can also recover some missing Health by using a Healing

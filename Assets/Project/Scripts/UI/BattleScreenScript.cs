@@ -182,7 +182,7 @@ namespace Realmrover
 
         public void MouseLeaveSkill(int index)
         {
-            Debug.Log("Mouse Left  :  " + index);
+            
             _gameManager.HideTooltip();
         }
 

@@ -118,7 +118,7 @@ namespace Realmrover
         {
             if(template == null)
             {
-                Debug.LogWarning("Setting Character Template: Template is null!");
+               // Debug.LogWarning("Setting Character Template: Template is null!");
             }
             _template = template;
             _level = level;
@@ -184,7 +184,7 @@ namespace Realmrover
 
 
             _energy -= energyCost;
-            Debug.Log("Energy used :            " + energyCost);
+            
 
             ClearNextEnergyBonusAll();
             ClearNextEnergyBonusBySkill(skill);
@@ -539,10 +539,10 @@ namespace Realmrover
             _currentHealth -= amount;
 
             bool spawnAtEnemy = this == _gameManager.CurrentEnemyCharacter() ? true : false;
-            if (type == FloatingTextType.SACRIFICE)
+            /*if (type == FloatingTextType.SACRIFICE)
             {
                 spawnAtEnemy = !spawnAtEnemy;
-            }
+            }*/
             
             _gameManager.QueueCombatText(amount, type, spawnAtEnemy);
             _animator.SetTrigger("Hit");
@@ -657,7 +657,6 @@ namespace Realmrover
                 result += effect.Amount;
             }
 
-            Debug.Log("Multiplier calculated to be : " + result);
             return result;
         }
 
@@ -736,14 +735,12 @@ namespace Realmrover
                 else
                 {
                     _damageIncreaseNextByAbility.Add(skill.EnhanceNextSkill, skill.EnhanceNextDamage);
-                    Debug.Log(skill.Name + "  has just added +" + skill.EnhanceNextDamage + "% damage to " + skill.EnhanceNextSkill.Name);
                 }
             }
         }
         private void ApplyAbsorbFromSkill(Skill skill)
         {
             _absorb += skill.Absorb;
-            Debug.Log("Absorb is now " + _absorb);
         }
 
         private void ApplyReflectFromSkill(Skill skill)
@@ -786,7 +783,6 @@ namespace Realmrover
             {
                 bool status = _healOverTimeEffects.Count > 0;
                 _healOverTimeEffects.Clear();
-                //Debug.Log("HEAL OVER TIME CLEARED. SKILL NULL.");
                 return status;
             }
         }
