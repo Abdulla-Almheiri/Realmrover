@@ -218,8 +218,16 @@ namespace Realmrover
 
         private void InitializeSFX()
         {
-            _soundVolume = PlayerPrefs.GetFloat("SoundVolume");
-            _musicVolume = PlayerPrefs.GetFloat("MusicVolume");
+            if (PlayerPrefs.HasKey("SoundVolume"))
+            {
+                _soundVolume = PlayerPrefs.GetFloat("SoundVolume");
+            }
+
+            if (PlayerPrefs.HasKey("MusicVolume"))
+            {
+                _musicVolume = PlayerPrefs.GetFloat("MusicVolume");
+            }
+
             _audioSource.volume = _soundVolume;
             _musicSource.volume = _musicVolume;
         }
@@ -349,7 +357,10 @@ namespace Realmrover
 
             if (GameState == GameState.BATTLE_PLAYER_TURN)
             {
-
+                if(_currentEnemyCharacter.IsAlive() == false)
+                {
+                    ChangeGameState(GameState.BATTLE_PLAYER_WIN);
+                }
                 _battleScreen.SetButtonText(BattleControlButtonTextType.END_TURN);
                 HandlePlayerInput();
                 if (_battleControlButtonPressed == true)
@@ -918,7 +929,7 @@ namespace Realmrover
 
             if(character == _currentEnemyCharacter)
             {
-                ChangeGameState(GameState.BATTLE_PLAYER_WIN, TurnDelay);
+                ChangeGameState(GameState.BATTLE_PLAYER_WIN);
             }
 
         }
