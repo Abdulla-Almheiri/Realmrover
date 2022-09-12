@@ -15,6 +15,16 @@ namespace Realmrover
         void Update()
         {
             transform.Translate(new Vector3(_direction.x*Time.deltaTime*Speed, _direction.y*Speed*Time.deltaTime));
+
+            if(Input.GetKeyUp(KeyCode.B))
+            {
+                _textMP.alpha = 0f;
+            }
+
+            if (Input.GetKeyUp(KeyCode.N))
+            {
+                _textMP.alpha = 1f;
+            }
         }
 
         public void Initialize(int value, FloatingTextType textType, Vector2 location, GameManager gameManager)

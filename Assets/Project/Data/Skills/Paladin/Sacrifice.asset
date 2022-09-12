@@ -18,8 +18,8 @@ MonoBehaviour:
   Level: 7
   EnergyCost: 0
   EnergyGain: 0
-  BaseDamage: 20
-  SacrificeDamage: 20
+  BaseDamage: 200
+  SacrificeDamage: 5
   SacrificeDamageLethal: 0
   Heal: 0
   Absorb: 0

@@ -37,9 +37,35 @@ namespace Realmrover
         private GameManager _gameManager;
         private BattleControlButtonTextType _buttonState = BattleControlButtonTextType.INITIAL;
 
+
+        public void ToggleHUD(bool value)
+        {
+            _battleControlButton.gameObject.SetActive(value);
+            _playerResources.gameObject.SetActive(value);
+            _enemyResources.gameObject.SetActive(value);
+            foreach(Image img in _skillIcons)
+            {
+                img.gameObject.SetActive(value);
+            }
+
+            foreach (Button btn in _skillButtons)
+            {
+                btn.gameObject.SetActive(value);
+            }
+        }
         private void Update()
         {
-            if(_buttonState == BattleControlButtonTextType.ENEMY_TURN)
+            if(Input.GetKeyDown(KeyCode.H))
+            {
+                ToggleHUD(false);
+            }
+
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                ToggleHUD(true);
+            }
+
+            if (_buttonState == BattleControlButtonTextType.ENEMY_TURN)
             {
 
             }

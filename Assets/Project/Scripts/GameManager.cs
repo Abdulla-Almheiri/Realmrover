@@ -140,6 +140,8 @@ namespace Realmrover
         private bool _tutorialStarted = false;
         private int _lastAbilityShown = 0;
         private bool _messageNextButtonPressed = false;
+        private bool _showDamageText = true;
+
         private void Awake()
         {
             Initialize();
@@ -156,7 +158,22 @@ namespace Realmrover
 
             if (Input.GetKeyDown(KeyCode.F))
             {
-                ShakeCamera(0.5f, 2f);
+                this.BattleControlButtonPressed();
+            }
+
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                
+            }
+
+             if(Input.GetKeyUp(KeyCode.B))
+            {
+                _showDamageText = false;
+            }
+
+            if (Input.GetKeyUp(KeyCode.N))
+            {
+                _showDamageText = true;
             }
         }
 
@@ -651,6 +668,11 @@ namespace Realmrover
 
         public void QueueCombatText(int value, FloatingTextType textType, bool atEnemy)
         {
+            if(_showDamageText == false)
+            {
+                return;
+            }
+
             _damageNumbersQueue.Enqueue(new FloatingTextQueueMessage(value, textType, atEnemy));
         }
 
